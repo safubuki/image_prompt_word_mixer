@@ -1,0 +1,2 @@
+# gemini_prompt_support
+Geminiで画像作成する際のプロンプト作成をサポートします。
