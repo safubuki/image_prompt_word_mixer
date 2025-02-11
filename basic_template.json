@@ -1,0 +1,14 @@
+{
+    "name": "基本プロンプトテンプレート",
+    "template": "{subject}が{costume}の着ぐるみを着ている写真を生成してください。 {costume}は、とてもかわいらしいです。",
+    "variables": {
+        "subject": {
+            "description": "被写体。例：日本人女性、アメリカ人女性など",
+            "default": "日本人女性"
+        },
+        "costume": {
+            "description": "着ぐるみの種類。例：カメ、うさぎなど",
+            "default": "カメ"
+        }
+    }
+}
