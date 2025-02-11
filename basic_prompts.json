@@ -8,6 +8,18 @@
         }
     },
     {
+        "name": "Basic Prompt 1.5",
+        "text": "{subject}が{costume}の着ぐるみを{wear}いる{photo}を{do}してください。\n{costume}は、とても{state}です。",
+        "variables": {
+            "subject": "日本人女性",
+            "costume": "カメ",
+            "wear": "脱いで",
+            "photo": "画像",
+            "do": "生成",
+            "state": "かっこわるい"
+        }
+    },
+    {
         "name": "Basic Prompt 2",
         "text": "{subject}が{background}の背景でポーズをとっている写真を生成してください。",
         "variables": {

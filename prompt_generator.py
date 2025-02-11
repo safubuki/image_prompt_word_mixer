@@ -2,16 +2,19 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import re
 from template_manager import TemplateManager
+import threading
 
 class PromptGeneratorApp:
     def __init__(self, master):
         self.master = master
         self.master.title("Gemini Prompt Generator")
-        self.master.geometry("800x600")  # Set fixed window size
+        self.master.geometry("800x800")  # Adjust window size
 
         self.template_manager = TemplateManager("basic_prompts.json", "element_prompts.json")
         self.basic_prompts = self.template_manager.get_basic_prompts()
         self.element_prompts = self.template_manager.get_element_prompts()
+
+        self.update_timer = None  # Initialize update_timer
 
         self.create_widgets()
         self.set_default_prompt()
@@ -21,12 +24,13 @@ class PromptGeneratorApp:
         basic_frame = ttk.LabelFrame(self.master, text="Basic Prompts")
         basic_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsew")
 
-        self.basic_combobox = ttk.Combobox(basic_frame, values=[prompt["name"] for prompt in self.basic_prompts], width=40)
+        self.basic_combobox = ttk.Combobox(basic_frame, values=[prompt["name"] for prompt in self.basic_prompts], width=50)
         self.basic_combobox.grid(row=0, column=0, padx=5, pady=5)
         self.basic_combobox.bind("<<ComboboxSelected>>", self.on_basic_select)
 
-        self.basic_text = tk.Text(basic_frame, height=10, width=33)  # Set width to 2/3 of the original
+        self.basic_text = tk.Text(basic_frame, height=10, width=50)  # Adjust size
         self.basic_text.grid(row=1, column=0, padx=5, pady=5)
+        self.basic_text.bind("<KeyRelease>", self.on_text_change)
 
         self.variable_frame = ttk.LabelFrame(basic_frame, text="Variables")
         self.variable_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
@@ -46,21 +50,19 @@ class PromptGeneratorApp:
             for prompt in category["prompts"]:
                 self.element_tree.insert(parent, tk.END, text=prompt["name"])
 
-        self.element_text = tk.Text(element_frame, height=10, width=50)
+        self.element_text = tk.Text(element_frame, height=15, width=50)  # Adjust size
         self.element_text.grid(row=1, column=0, padx=5, pady=5)
+        self.element_text.bind("<KeyRelease>", self.on_text_change)
 
         # Final Prompt Section
         final_frame = ttk.LabelFrame(self.master, text="Final Prompt")
         final_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-        self.final_text = tk.Text(final_frame, height=10, width=100, state="disabled")
+        self.final_text = tk.Text(final_frame, height=15, width=100, state="disabled")
         self.final_text.grid(row=0, column=0, padx=5, pady=5)
 
         copy_button = ttk.Button(final_frame, text="Copy to Clipboard", command=self.copy_to_clipboard)
         copy_button.grid(row=1, column=0, padx=5, pady=5)
-
-        generate_button = ttk.Button(final_frame, text="Generate Final Prompt", command=self.generate_final_prompt)
-        generate_button.grid(row=1, column=1, padx=5, pady=5)
 
     def set_default_prompt(self):
         self.basic_combobox.current(0)
@@ -73,6 +75,7 @@ class PromptGeneratorApp:
             self.basic_text.delete(1.0, tk.END)
             self.basic_text.insert(tk.END, prompt["text"])
             self.update_variable_entries(prompt["variables"])
+            self.schedule_update()
 
     def update_variable_entries(self, variables):
         for widget in self.variable_frame.winfo_children():
@@ -86,6 +89,7 @@ class PromptGeneratorApp:
             entry = ttk.Entry(self.variable_frame)
             entry.grid(row=row*2+1, column=col, padx=5, pady=5, sticky="ew")
             entry.insert(0, default_value)
+            entry.bind("<KeyRelease>", self.on_text_change)
             self.variable_entries[var] = entry
 
     def on_element_select(self, event):
@@ -94,11 +98,22 @@ class PromptGeneratorApp:
             item = self.element_tree.item(selection[0])
             self.element_text.delete(1.0, tk.END)
             self.element_text.insert(tk.END, item["text"])
+            self.schedule_update()
+
+    def on_text_change(self, _):
+        self.schedule_update()
+
+    def schedule_update(self):
+        if self.update_timer:
+            self.master.after_cancel(self.update_timer)
+        self.update_timer = self.master.after(1000, self.generate_final_prompt)  # 1 second delay
 
     def generate_final_prompt(self):
         basic_text = self.basic_text.get(1.0, tk.END).strip()
         variables = {var: entry.get() for var, entry in self.variable_entries.items()}
         final_prompt = self.template_manager.replace_variables(basic_text, variables)
+        element_text = self.element_text.get(1.0, tk.END).strip()
+        final_prompt += "\n" + element_text
         self.final_text.config(state=tk.NORMAL)
         self.final_text.delete(1.0, tk.END)
         self.final_text.insert(tk.END, final_prompt)
