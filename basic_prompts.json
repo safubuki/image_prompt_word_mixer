@@ -1,0 +1,10 @@
+[
+    {
+        "name": "Basic Prompt 1",
+        "text": "{subject}が{costume}の着ぐるみを着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。"
+    },
+    {
+        "name": "Basic Prompt 2",
+        "text": "{subject}が{background}の背景でポーズをとっている写真を生成してください。"
+    }
+]
