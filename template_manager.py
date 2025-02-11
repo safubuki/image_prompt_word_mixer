@@ -1,4 +1,5 @@
 import json
+import re
 
 class TemplateManager:
     def __init__(self, basic_prompt_file, element_prompt_file):

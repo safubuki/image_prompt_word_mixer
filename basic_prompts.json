@@ -1,10 +1,18 @@
 [
     {
         "name": "Basic Prompt 1",
-        "text": "{subject}が{costume}の着ぐるみを着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。"
+        "text": "{subject}が{costume}の着ぐるみを着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。",
+        "variables": {
+            "subject": "日本人女性",
+            "costume": "カメ"
+        }
     },
     {
         "name": "Basic Prompt 2",
-        "text": "{subject}が{background}の背景でポーズをとっている写真を生成してください。"
+        "text": "{subject}が{background}の背景でポーズをとっている写真を生成してください。",
+        "variables": {
+            "subject": "アメリカ人女性",
+            "background": "公園"
+        }
     }
 ]
