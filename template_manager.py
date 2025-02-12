@@ -3,9 +3,9 @@ template_manager.py
 プロンプトデータの読み込み、保存、更新および変数の置換機能を提供するコンポーネントです。
 """
 import json
-import sys
 import tkinter as tk
 from tkinter import messagebox
+import sys
 
 
 class TemplateManager:
@@ -42,7 +42,8 @@ class TemplateManager:
         except FileNotFoundError:
             root = tk.Tk()
             root.withdraw()  # メインウィンドウを表示しない
-            messagebox.showerror("Error", "jsonファイルをexeファイルと同じフォルダに用意してください。")
+            messagebox.showerror(
+                "Error", "jsonファイルをexeファイルと同じフォルダに用意してください。")
             sys.exit()  # Change exit() to sys.exit()
 
     def save_prompts(self, filename, prompts):
