@@ -6,10 +6,12 @@ final_prompt_frame.py
 import tkinter as tk
 from tkinter import ttk
 
+
 class FinalPromptFrame(ttk.LabelFrame):
     """
     FinalPromptFrame クラスは、完成プロンプトの表示とクリップボードへのコピー機能を提供するコンポーネントです。
     """
+
     def __init__(self, master, copy_command, *args, **kwargs):
         """
         コンストラクタ
@@ -31,4 +33,3 @@ class FinalPromptFrame(ttk.LabelFrame):
         self.final_text.grid(row=0, column=0, padx=5, pady=5)
         copy_button = ttk.Button(self, text="クリップボードにコピー", command=self.copy_command)
         copy_button.grid(row=1, column=0, padx=5, pady=5)
-        

@@ -6,10 +6,12 @@ basic_prompt_frame.py
 import tkinter as tk
 from tkinter import ttk
 
+
 class BasicPromptFrame(ttk.LabelFrame):
     """
     BasicPromptFrame クラスは、基本プロンプトの選択、テンプレート表示および変数入力を提供するコンポーネントです。
     """
+
     def __init__(self, master, basic_prompts, on_basic_select, on_text_change, *args, **kwargs):
         """
         コンストラクタ
@@ -35,10 +37,9 @@ class BasicPromptFrame(ttk.LabelFrame):
         # 基本プロンプト選択部分
         basic_select_frame = ttk.LabelFrame(self, text="基本プロンプトを選択")
         basic_select_frame.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nsew")
-        self.basic_combobox = ttk.Combobox(
-            basic_select_frame,
-            values=[prompt["name"] for prompt in self.basic_prompts],
-            width=48)
+        self.basic_combobox = ttk.Combobox(basic_select_frame,
+                                           values=[prompt["name"] for prompt in self.basic_prompts],
+                                           width=48)
         self.basic_combobox.grid(row=0, column=0, padx=5, pady=5)
         self.basic_combobox.bind("<<ComboboxSelected>>", self.on_basic_select)
 

@@ -6,10 +6,12 @@ element_prompt_frame.py
 import tkinter as tk
 from tkinter import ttk
 
+
 class ElementPromptFrame(ttk.LabelFrame):
     """
     ElementPromptFrame クラスは、追加プロンプトの選択と表示機能を提供するコンポーネントです。
     """
+
     def __init__(self, master, element_prompts, on_element_select, on_text_change, *args, **kwargs):
         """
         コンストラクタ
