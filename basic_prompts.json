@@ -1,10 +1,10 @@
 [
     {
-        "name": "主人公がコスチュームを着る",
-        "text": "{character}が{costume}を着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。",
+        "name": "人物がものを持っている",
+        "text": "{character}が{goods}を持っている写真を生成してください。\n{goods}は、ユニークです。",
         "variables": {
-            "character": "日本人女性",
-            "costume": "カメの着ぐるみ"
+            "character": "中年男性",
+            "goods": "マグカップ"
         }
     },
     {
@@ -12,7 +12,7 @@
         "text": "{character}が{background}を背景にポーズをとっている写真を生成してください。",
         "variables": {
             "character": "アメリカ人女性",
-            "background": "緑が豊かな公園"
+            "background": "美しい夕焼け"
         }
     }
 ]
