@@ -3,6 +3,7 @@ app.py
 Gemini Prompt Generatorアプリケーションの起動およびUI統合機能を提供するコンポーネントです。
 """
 import tkinter as tk
+import os  # osモジュールを追加
 
 from template_manager import TemplateManager
 from ui.basic_prompt_frame import BasicPromptFrame
@@ -24,8 +25,14 @@ class PromptGeneratorApp:
         """
         self.master = master
         self.master.title("Gemini Prompt Generator")
-        # 固定サイズ設定を削除（内部要素のサイズに合わせて自動調整）
-        # self.master.geometry("800x800")
+
+        # アイコン設定
+        icon_path = os.path.join("image", "turtle.ico")  # imageフォルダのアイコン
+        try:
+            self.master.iconbitmap(icon_path)
+        except tk.TclError:
+            print(f"アイコンファイルが見つかりませんでした: {icon_path}")
+
         self.master.resizable(True, True)
 
         self.template_manager = TemplateManager("basic_prompts.json", "element_prompts.json")
