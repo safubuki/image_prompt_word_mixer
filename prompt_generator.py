@@ -59,7 +59,7 @@ class PromptGeneratorApp:
             for prompt in category["prompts"]:
                 self.element_tree.insert(parent, tk.END, text=prompt["name"])
 
-        self.element_text = tk.Text(element_frame, height=12, width=50)  # サイズ調整
+        self.element_text = tk.Text(element_frame, height=7, width=50)  # サイズ調整
         self.element_text.grid(row=2, column=0, padx=5, pady=5)
         self.element_text.bind("<KeyRelease>", self.on_text_change)
 
