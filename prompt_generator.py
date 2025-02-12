@@ -152,21 +152,33 @@ class PromptGeneratorApp:
         """Element PromptのTreeviewで項目が選択された際の処理を行います。
         
         選択されたプロンプトのテキストを取得し、改行区切りで表示します。
-        また、Subject入力欄の値で{subject}を置換します。
+        同一のプロンプトが重複して登録されていても、一意に表示します。
         """
         selection = event.widget.selection()
         selected_texts = []
+        seen_keys = set()
+        # ルートレベルの親アイテムのリスト（挿入順＝JSON内の順序と同じと仮定）
+        parent_ids = list(self.element_tree.get_children(""))
+        
         for item in selection:
-            item_text = self.element_tree.item(item, "text")
             parent = self.element_tree.parent(item)
             if parent:
-                for category in self.element_prompts:
-                    if category["category"] == self.element_tree.item(
-                            parent)["text"]:
-                        for prompt in category["prompts"]:
-                            if prompt["name"] == item_text:
-                                selected_texts.append(prompt["text"])
-                                break
+                try:
+                    # この親アイテムのインデックスをJSON内のカテゴリデータの順番と対応させる
+                    category_index = parent_ids.index(parent)
+                except ValueError:
+                    continue
+                category_data = self.element_prompts[category_index]
+                item_text = self.element_tree.item(item, "text")
+                for prompt in category_data["prompts"]:
+                    if prompt["name"] == item_text:
+                        # キーとして、カテゴリ、プロンプト名、プロンプトテキストの組み合わせを利用
+                        key = (category_data["category"], prompt["name"], prompt["text"])
+                        if key not in seen_keys:
+                            seen_keys.add(key)
+                            selected_texts.append(prompt["text"])
+                        break
+        
         element_prompt_raw = "\n".join(selected_texts)
         subject_val = self.element_subject_entry.get().strip()
         element_prompt_final = self.template_manager.replace_variables(
