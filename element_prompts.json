@@ -2,16 +2,16 @@
     {
         "category": "感情表現",
         "prompts": [
-            {"name": "素敵な笑顔", "text": "その{subject}は、素敵は笑顔で微笑みかけます。"},
-            {"name": "悲しい気持ち", "text": "その{subject}は、悲しい気持ちを感じています。"}
+            {"name": "素敵な笑顔", "text": "その{character}は、素敵は笑顔で微笑みかけます。"},
+            {"name": "悲しい気持ち", "text": "その{character}は、悲しい気持ちを感じています。"}
         ]
     },
     {
         "category": "アクション",
         "prompts": [
-            {"name": "走っている", "text": "その{subject}は、素早く走っている。"},
-            {"name": "ジャンプしている", "text": "その{subject}は、高くジャンプしています。"},
-            {"name": "クライミング", "text": "その{subject}は、急な壁を登っています。"}
+            {"name": "走っている", "text": "その{character}は、素早く走っている。"},
+            {"name": "ジャンプしている", "text": "その{character}は、高くジャンプしています。"},
+            {"name": "クライミング", "text": "その{character}は、急な壁を登っています。"}
         ]
     }
 ]

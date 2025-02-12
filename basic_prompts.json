@@ -1,17 +1,17 @@
 [
     {
         "name": "主人公がコスチュームを着る",
-        "text": "{subject}が{costume}を着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。",
+        "text": "{character}が{costume}を着ている写真を生成してください。\n{costume}は、とてもかわいらしいです。",
         "variables": {
-            "subject": "日本人女性",
+            "character": "日本人女性",
             "costume": "カメの着ぐるみ"
         }
     },
     {
         "name": "背景をバックにポーズを取る",
-        "text": "{subject}が{background}を背景にポーズをとっている写真を生成してください。",
+        "text": "{character}が{background}を背景にポーズをとっている写真を生成してください。",
         "variables": {
-            "subject": "アメリカ人女性",
+            "character": "アメリカ人女性",
             "background": "緑が豊かな公園"
         }
     }

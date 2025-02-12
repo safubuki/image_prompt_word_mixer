@@ -98,7 +98,7 @@ class PromptGeneratorApp:
         element_prompt_raw = "\n".join(selected_texts)
         subject_val = self.element_frame.subject_entry.get().strip()
         element_prompt_final = self.template_manager.replace_variables(
-            element_prompt_raw, {"subject": subject_val})
+            element_prompt_raw, {"character": subject_val})
         self.element_frame.element_text.delete(1.0, tk.END)
         self.element_frame.element_text.insert(tk.END, element_prompt_final)
         self.schedule_update()
@@ -136,11 +136,10 @@ class PromptGeneratorApp:
 
     def copy_to_clipboard(self):
         """
-        最終プロンプトをクリップボードにコピーし、通知を表示します。
+        最終プロンプトをクリップボードにコピーします。
         """
         self.master.clipboard_clear()
         self.master.clipboard_append(self.final_frame.final_text.get(1.0, tk.END))
-        messagebox.showinfo("Copied", "Final prompt copied to clipboard.")
 
 if __name__ == "__main__":
     root = tk.Tk()
