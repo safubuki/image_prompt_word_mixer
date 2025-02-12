@@ -41,8 +41,17 @@ class PromptGeneratorApp:
         element_frame = ttk.LabelFrame(self.master, text="Element Prompts")
         element_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
+        # Subject入力欄を追加
+        subject_frame = ttk.Frame(element_frame)
+        subject_frame.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        subject_label = ttk.Label(subject_frame, text="Subject:")
+        subject_label.pack(side=tk.LEFT)
+        self.element_subject_entry = ttk.Entry(subject_frame, width=30)
+        self.element_subject_entry.pack(side=tk.LEFT)
+        self.element_subject_entry.insert(0, "被写体")  # 初期値を設定（必要に応じて変更）
+
         self.element_tree = ttk.Treeview(element_frame, selectmode="extended")  # 複数選択可能に設定
-        self.element_tree.grid(row=0, column=0, padx=5, pady=5)
+        self.element_tree.grid(row=1, column=0, padx=5, pady=5)
         self.element_tree.bind("<<TreeviewSelect>>", self.on_element_select)
 
         for category in self.element_prompts:
@@ -51,7 +60,7 @@ class PromptGeneratorApp:
                 self.element_tree.insert(parent, tk.END, text=prompt["name"])
 
         self.element_text = tk.Text(element_frame, height=12, width=50)  # サイズ調整
-        self.element_text.grid(row=1, column=0, padx=5, pady=5)
+        self.element_text.grid(row=2, column=0, padx=5, pady=5)
         self.element_text.bind("<KeyRelease>", self.on_text_change)
 
         # Final Prompt Section
@@ -105,9 +114,13 @@ class PromptGeneratorApp:
                             if prompt["name"] == item_text:
                                 selected_texts.append(prompt["text"])
                                 break
-        # 複数選択時は、それぞれのプロンプトを改行区切りで表示
+        # Element Promptは各プロンプトを改行区切りで表示
+        element_prompt_raw = "\n".join(selected_texts)
+        subject_val = self.element_subject_entry.get().strip()
+        # subjectの置換（置換する変数は{subject}）
+        element_prompt_final = self.template_manager.replace_variables(element_prompt_raw, {"subject": subject_val})
         self.element_text.delete(1.0, tk.END)
-        self.element_text.insert(tk.END, "\n".join(selected_texts))
+        self.element_text.insert(tk.END, element_prompt_final)
         self.schedule_update()
 
     def on_text_change(self, _):

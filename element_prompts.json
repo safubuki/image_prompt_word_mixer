@@ -2,15 +2,15 @@
     {
         "category": "Emotion",
         "prompts": [
-            {"name": "Happy", "text": "[subject] is feeling very happy."},
-            {"name": "Sad", "text": "[subject] is feeling very sad."}
+            {"name": "Happy", "text": "{subject} is feeling very happy."},
+            {"name": "Sad", "text": "{subject} is feeling very sad."}
         ]
     },
     {
         "category": "Action",
         "prompts": [
-            {"name": "Running", "text": "[subject] is running fast."},
-            {"name": "Jumping", "text": "[subject] is jumping high."}
+            {"name": "Running", "text": "{subject} is running fast."},
+            {"name": "Jumping", "text": "{subject} is jumping high."}
         ]
     }
 ]
