@@ -8,13 +8,13 @@ class PromptGeneratorApp:
     def __init__(self, master):
         self.master = master
         self.master.title("Gemini Prompt Generator")
-        self.master.geometry("800x800")  # Adjust window size
+        self.master.geometry("800x800")  # ウィンドウサイズの調整
 
         self.template_manager = TemplateManager("basic_prompts.json", "element_prompts.json")
         self.basic_prompts = self.template_manager.get_basic_prompts()
         self.element_prompts = self.template_manager.get_element_prompts()
 
-        self.update_timer = None  # Initialize update_timer
+        self.update_timer = None  # update_timerの初期化
 
         self.create_widgets()
         self.set_default_prompt()
@@ -28,7 +28,7 @@ class PromptGeneratorApp:
         self.basic_combobox.grid(row=0, column=0, padx=5, pady=5)
         self.basic_combobox.bind("<<ComboboxSelected>>", self.on_basic_select)
 
-        self.basic_text = tk.Text(basic_frame, height=10, width=50)  # Adjust size
+        self.basic_text = tk.Text(basic_frame, height=10, width=50)  # サイズ調整
         self.basic_text.grid(row=1, column=0, padx=5, pady=5)
         self.basic_text.bind("<KeyRelease>", self.on_text_change)
 
@@ -41,7 +41,7 @@ class PromptGeneratorApp:
         element_frame = ttk.LabelFrame(self.master, text="Element Prompts")
         element_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        self.element_tree = ttk.Treeview(element_frame)
+        self.element_tree = ttk.Treeview(element_frame, selectmode="extended")  # 複数選択可能に設定
         self.element_tree.grid(row=0, column=0, padx=5, pady=5)
         self.element_tree.bind("<<TreeviewSelect>>", self.on_element_select)
 
@@ -50,7 +50,7 @@ class PromptGeneratorApp:
             for prompt in category["prompts"]:
                 self.element_tree.insert(parent, tk.END, text=prompt["name"])
 
-        self.element_text = tk.Text(element_frame, height=15, width=50)  # Adjust size
+        self.element_text = tk.Text(element_frame, height=12, width=50)  # サイズ調整
         self.element_text.grid(row=1, column=0, padx=5, pady=5)
         self.element_text.bind("<KeyRelease>", self.on_text_change)
 
@@ -94,11 +94,21 @@ class PromptGeneratorApp:
 
     def on_element_select(self, event):
         selection = event.widget.selection()
-        if selection:
-            item = self.element_tree.item(selection[0])
-            self.element_text.delete(1.0, tk.END)
-            self.element_text.insert(tk.END, item["text"])
-            self.schedule_update()
+        selected_texts = []
+        for item in selection:
+            item_text = self.element_tree.item(item, "text")
+            parent = self.element_tree.parent(item)
+            if parent:
+                for category in self.element_prompts:
+                    if category["category"] == self.element_tree.item(parent)["text"]:
+                        for prompt in category["prompts"]:
+                            if prompt["name"] == item_text:
+                                selected_texts.append(prompt["text"])
+                                break
+        # 複数選択時は、それぞれのプロンプトを改行区切りで表示
+        self.element_text.delete(1.0, tk.END)
+        self.element_text.insert(tk.END, "\n".join(selected_texts))
+        self.schedule_update()
 
     def on_text_change(self, _):
         self.schedule_update()
@@ -106,7 +116,7 @@ class PromptGeneratorApp:
     def schedule_update(self):
         if self.update_timer:
             self.master.after_cancel(self.update_timer)
-        self.update_timer = self.master.after(1000, self.generate_final_prompt)  # 1 second delay
+        self.update_timer = self.master.after(1000, self.generate_final_prompt)  # 1秒のディレイ
 
     def generate_final_prompt(self):
         basic_text = self.basic_text.get(1.0, tk.END).strip()
