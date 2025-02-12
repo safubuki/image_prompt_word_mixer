@@ -1,16 +1,17 @@
 [
     {
-        "category": "Emotion",
+        "category": "感情表現",
         "prompts": [
-            {"name": "Happy", "text": "{subject} is feeling very happy."},
-            {"name": "Sad", "text": "{subject} is feeling very sad."}
+            {"name": "素敵な笑顔", "text": "その{subject}は、素敵は笑顔で微笑みかけます。"},
+            {"name": "悲しい気持ち", "text": "その{subject}は、悲しい気持ちを感じています。"}
         ]
     },
     {
-        "category": "Action",
+        "category": "アクション",
         "prompts": [
-            {"name": "Running", "text": "{subject} is running fast."},
-            {"name": "Jumping", "text": "{subject} is jumping high."}
+            {"name": "走っている", "text": "その{subject}は、素早く走っている。"},
+            {"name": "ジャンプしている", "text": "その{subject}は、高くジャンプしています。"},
+            {"name": "クライミング", "text": "その{subject}は、急な壁を登っています。"}
         ]
     }
 ]

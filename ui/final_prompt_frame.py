@@ -19,7 +19,7 @@ class FinalPromptFrame(ttk.LabelFrame):
             copy_command (function): コピー時に実行するコールバック関数
             *args, **kwargs: その他の引数
         """
-        super().__init__(master, text="完成プロンプト（基本＋追加）", *args, **kwargs)
+        super().__init__(master, text="初回画像生成用プロンプト（基本＋追加）", *args, **kwargs)
         self.copy_command = copy_command
         self.create_widgets()
 
@@ -31,3 +31,4 @@ class FinalPromptFrame(ttk.LabelFrame):
         self.final_text.grid(row=0, column=0, padx=5, pady=5)
         copy_button = ttk.Button(self, text="クリップボードにコピー", command=self.copy_command)
         copy_button.grid(row=1, column=0, padx=5, pady=5)
+        
