@@ -1,16 +1,18 @@
+"""
+template_manager.py
+プロンプトデータの読み込み、保存、更新および変数の置換機能を提供するコンポーネントです。
+"""
 import json
-import re
 
 
 class TemplateManager:
     """
-    プロンプトデータ（基本プロンプトおよび要素プロンプト）の読み込み・保存・更新、
-    および変数の置換を行うクラスです。
+    TemplateManager クラスは、プロンプトデータの読み込み、保存、更新および変数置換を提供するコンポーネントです。
     """
 
     def __init__(self, basic_prompt_file, element_prompt_file):
         """
-        TemplateManagerのコンストラクタです。
+        コンストラクタ
         
         引数:
             basic_prompt_file (str): 基本プロンプトJSONファイルのパス
@@ -68,11 +70,11 @@ class TemplateManager:
 
     def update_basic_prompt(self, index, new_prompt):
         """
-        指定されたインデックスの基本プロンプトを新しいプロンプトに更新し、JSONファイルに保存します。
+        指定されたインデックスの基本プロンプトを更新し、JSONファイルに保存します。
         
         引数:
             index (int): 更新するプロンプトのインデックス
-            new_prompt (dict): 新しいプロンプトデータ（辞書）
+            new_prompt (dict): 新しいプロンプトデータ
         """
         if 0 <= index < len(self.basic_prompts):
             self.basic_prompts[index] = new_prompt
@@ -80,19 +82,18 @@ class TemplateManager:
 
     def update_element_prompt(self, category, index, new_prompt):
         """
-        指定されたカテゴリとインデックスの要素プロンプトを新しいプロンプトに更新し、JSONファイルに保存します。
+        指定されたカテゴリとインデックスの要素プロンプトを更新し、JSONファイルに保存します。
         
         引数:
             category (str): 要素プロンプトのカテゴリ名
             index (int): 更新するプロンプトのインデックス
-            new_prompt (dict): 新しいプロンプトデータ（辞書）
+            new_prompt (dict): 新しいプロンプトデータ
         """
         for cat in self.element_prompts:
             if cat["category"] == category:
                 if 0 <= index < len(cat["prompts"]):
                     cat["prompts"][index] = new_prompt
-                    self.save_prompts(self.element_prompt_file,
-                                      self.element_prompts)
+                    self.save_prompts(self.element_prompt_file, self.element_prompts)
                     break
 
     def replace_variables(self, text, variables):
