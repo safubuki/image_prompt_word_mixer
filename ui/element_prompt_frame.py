@@ -47,14 +47,15 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.subject_entry.insert(0, "被写体")  # 初期値設定
 
         # 追加プロンプト選択用Treeview
-        self.tree = ttk.Treeview(select_frame, selectmode="extended", height=9)  # heightを追加して高さを調整
+        self.tree = ttk.Treeview(select_frame, selectmode="extended", height=9)
         self.tree.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
-        self.tree.column("#0", width=350)  # 横幅を調整する行を追加
+        self.tree.column("#0", width=350)
         self.tree.bind("<<TreeviewSelect>>", self.on_element_select)
         for category in self.element_prompts:
             parent = self.tree.insert("", tk.END, text=category["category"])
-            for prompt in category["prompts"]:
-                self.tree.insert(parent, tk.END, text=prompt["name"])
+            # キー名 "prompts" -> "prompt_lists"、"name" -> "title" に変更
+            for prompt in category["prompt_lists"]:
+                self.tree.insert(parent, tk.END, text=prompt["title"])
 
         # 追加プロンプト表示部分
         display_frame = ttk.LabelFrame(self, text="追加プロンプトを表示")

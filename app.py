@@ -71,10 +71,10 @@ class PromptGeneratorApp:
         """
         selection = self.basic_frame.basic_combobox.current()
         if selection >= 0:
-            prompt = self.basic_prompts[selection]
+            prompt_obj = self.basic_prompts[selection]
             self.basic_frame.basic_text.delete(1.0, tk.END)
-            self.basic_frame.basic_text.insert(tk.END, prompt["text"])
-            self.basic_frame.update_variable_entries(prompt["variables"])
+            self.basic_frame.basic_text.insert(tk.END, prompt_obj["prompt"])
+            self.basic_frame.update_variable_entries(prompt_obj["default_variables"])
             self.schedule_update()
 
     def on_element_select(self, event):
@@ -96,12 +96,13 @@ class PromptGeneratorApp:
                     continue
                 category_data = self.element_prompts[category_index]
                 item_text = self.element_frame.tree.item(item, "text")
-                for prompt in category_data["prompts"]:
-                    if prompt["name"] == item_text:
-                        key = (category_data["category"], prompt["name"], prompt["text"])
+                # キー "prompts" -> "prompt_lists"、"name" -> "title"、"text" -> "prompt"
+                for prompt in category_data["prompt_lists"]:
+                    if prompt["title"] == item_text:
+                        key = (category_data["category"], prompt["title"], prompt["prompt"])
                         if key not in seen_keys:
                             seen_keys.add(key)
-                            selected_texts.append(prompt["text"])
+                            selected_texts.append(prompt["prompt"])
                         break
 
         element_prompt_raw = "\n".join(selected_texts)

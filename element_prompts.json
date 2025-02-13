@@ -1,17 +1,17 @@
 [
     {
         "category": "感情表現",
-        "prompts": [
-            {"name": "笑顔", "text": "その{character}は、笑顔です。"},
-            {"name": "悲しい", "text": "その{character}は、悲しそうです。"}
+        "prompt_lists": [
+            {"title": "笑顔", "prompt": "その{character}は、笑顔です。"},
+            {"title": "悲しい", "prompt": "その{character}は、悲しそうです。"}
         ]
     },
     {
         "category": "アクション",
-        "prompts": [
-            {"name": "走っている", "text": "その{character}は、素早く走っている。"},
-            {"name": "ジャンプしている", "text": "その{character}は、ジャンプしています。"},
-            {"name": "クライミング", "text": "その{character}は、壁を登っています。"}
+        "prompt_lists": [
+            {"title": "走っている", "prompt": "その{character}は、素早く走っている。"},
+            {"title": "ジャンプしている", "prompt": "その{character}は、ジャンプしています。"},
+            {"title": "クライミング", "prompt": "その{character}は、壁を登っています。"}
         ]
     }
 ]

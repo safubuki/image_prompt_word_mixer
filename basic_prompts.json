@@ -1,8 +1,8 @@
 [
     {
         "name": "人物がものを持っている",
-        "text": "{character}が{goods}を持っている写真を生成してください。\n{goods}は、{state}です。",
-        "variables": {
+        "prompt": "{character}が{goods}を持っている写真を生成してください。\n{goods}は、{state}です。",
+        "default_variables": {
             "character": "中年男性",
             "goods": "マグカップ",
             "state": "ユニーク"
@@ -10,8 +10,8 @@
     },
     {
         "name": "背景をバックにポーズを取る",
-        "text": "{character}が{background}を背景にポーズをとっている写真を生成してください。",
-        "variables": {
+        "prompt": "{character}が{background}を背景にポーズをとっている写真を生成してください。",
+        "default_variables": {
             "character": "アメリカ人女性",
             "background": "美しい夕焼け"
         }
