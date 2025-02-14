@@ -50,7 +50,7 @@ class PromptGeneratorApp:
                                                 self.on_element_select, self.on_text_change)
         self.element_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
-        self.final_frame = FinalPromptFrame(master, self.copy_to_clipboard)
+        self.final_frame = FinalPromptFrame(master)
         self.final_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # 変数設定はBasicPromptFrame内のvariable_frameを利用
@@ -141,14 +141,6 @@ class PromptGeneratorApp:
         self.final_frame.final_text.delete(1.0, tk.END)
         self.final_frame.final_text.insert(tk.END, final_prompt)
         self.final_frame.final_text.config(state=tk.DISABLED)
-
-    def copy_to_clipboard(self):
-        """
-        最終プロンプトをクリップボードにコピーします。
-        """
-        self.master.clipboard_clear()
-        self.master.clipboard_append(self.final_frame.final_text.get(1.0, tk.END))
-
 
 if __name__ == "__main__":
     root = tk.Tk()
