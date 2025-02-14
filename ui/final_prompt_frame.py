@@ -21,7 +21,7 @@ class FinalPromptFrame(ttk.LabelFrame):
         引数:
             master (tk.Widget): 親ウィジェット
         """
-        super().__init__(master, text="初回画像生成用プロンプト（基本＋追加）", *args, **kwargs)
+        super().__init__(master, text="完成プロンプト（基本＋追加）", *args, **kwargs)
         self.create_widgets()
 
     def create_widgets(self):
