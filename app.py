@@ -24,7 +24,7 @@ class PromptGeneratorApp:
             master (tk.Widget): ルートウィジェット
         """
         self.master = master
-        self.master.title("Gemini Prompt Generator")
+        self.master.title("Image Prompt Word-Mixer ")
 
         # アイコン設定
         icon_path = os.path.join("image", "turtle.ico")  # imageフォルダのアイコン

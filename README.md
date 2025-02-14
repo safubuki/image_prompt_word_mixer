@@ -1,4 +1,4 @@
-# gemini_prompt_support
+# Image Prompt Word-Mixer 
 Geminiで画像作成する際のプロンプト作成をサポートします。
 
 ## 使い方
