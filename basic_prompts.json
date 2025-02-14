@@ -1,19 +1,40 @@
 [
     {
+        "name": "汎用ポートレート写真",
+        "prompt": "{age}歳の{character}のポートレート写真を生成してください。\n{wear}を着て、{expression}雰囲気です。\n背景は{background}です。",
+        "default_variables": {
+            "age": 25,
+            "character": "日本人女性",
+            "wear": "暖かそうなコート",
+            "expression": "明るい",
+            "background": "雪が積もる美しい日本の風景"
+        }
+    },
+    {
+        "name": "汎用風景写真",
+        "prompt": "{location}の{time}の風景写真を生成してください。\n{atmosphere}な雰囲気です。",
+        "default_variables": {
+            "location": "公園",
+            "time": "夕暮れ時",
+            "atmosphere": "とても穏やか"
+        }
+    },
+    {
+        "name": "衣装を着た人物",
+        "prompt": "{character}が{wear}を着ている写真を生成してください。\n{wear}は、とても{state}です。",
+        "default_variables": {
+            "character": "日本人女性",
+            "wear": "カメの着ぐるみ",
+            "state": "かわいらしい"
+        }
+    },
+    {
         "name": "人物がものを持っている",
         "prompt": "{character}が{goods}を持っている写真を生成してください。\n{goods}は、{state}です。",
         "default_variables": {
             "character": "中年男性",
             "goods": "マグカップ",
             "state": "ユニーク"
-        }
-    },
-    {
-        "name": "背景をバックにポーズを取る",
-        "prompt": "{character}が{background}を背景にポーズをとっている写真を生成してください。",
-        "default_variables": {
-            "character": "アメリカ人女性",
-            "background": "美しい夕焼け"
         }
     }
 ]
