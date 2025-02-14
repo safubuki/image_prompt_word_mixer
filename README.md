@@ -131,8 +131,8 @@ DeePL API を利用するためには、API キーが必要です。API キー�
 [https://www.deepl.com/ja/pro-api](https://www.deepl.com/ja/pro-api)  
 なお、API利用にあたっては、ユーザー登録、住所登録、クレジットカード登録が必要です。
 
-- **APIキーの設定**  
-DeePL の APIキーを取得したら、 [api_key.json](api_key.json) に保存してください。
+- **APIキーの設定([api_key.json](api_key.json))**  
+DeePL の APIキーを取得したら、api_key.json に保存してください。
 以下のjsonフォーマットのyour_api_key_hereの部分をDeepLのAPIキーに置き換えてください。
 
   ```json
