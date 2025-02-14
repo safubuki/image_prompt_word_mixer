@@ -1,11 +1,24 @@
 # Image Prompt Word-Mixer 
-画像作成する際のプロンプト作成をサポートします。
+Image Prompt Word-Mixer は、画像生成に使用するプロンプトのワードを自由に組み替えることで、さまざまなパターンの画像作成を支援するデスクトップアプリケーションです。
+ 
+  <div align="center">
+    <img src="./image/winter_tool.png" alt="Winter Tool" width="550"/>
+    <p>Image Prompt Word-Mixerの画面</p>
+    <p>▼</p>
+    <img src="./image/winter_gemini.png" alt="Winter Tool" height="200"/>
+    <img src="./image/winter_fx.png" alt="Winter Tool" height="200"/>
+    <p>様々な生成AIツールに利用可能です！</p>
+  </div>
+
 
 ## 使い方
 
 1. **環境設定**  
    - Python 3.x がインストールされていることを確認してください。  
-   - 特別な外部パッケージは不要です（Tkinterは標準ライブラリに含まれています）。
+   - 依存パッケージとして [requests](https://pypi.org/project/requests/) を利用しているため、以下のコマンドでインストールしてください。  
+     ```sh
+     pip install requests
+     ```  
 
 2. **起動方法**  
    - プロジェクトルートディレクトリに移動し、以下のコマンドでアプリケーションを起動してください。  
@@ -107,4 +120,34 @@
 
        - **prompt**  
          実際に画像生成に用いられる説明テンプレートです。テンプレート内に含まれる `{character}` のプレースホルダは、実行時に`主語`テキストボックスに指定された文字列に置換されます。
+
+
+## 英訳機能
+
+本機能では、ユーザーが生成した日本語のプロンプトを DeePL API を利用して英訳することができます。  
+
+- **APIキーの取得**  
+DeePL API を利用するためには、API キーが必要です。API キーは DeePL の公式サイトで取得できます。  
+[https://www.deepl.com/ja/pro-api](https://www.deepl.com/ja/pro-api)  
+なお、API利用にあたっては、ユーザー登録、住所登録、クレジットカード登録が必要です。
+
+- **APIキーの設定**  
+DeePL の APIキーを取得したら、 [api_key.json](api_key.json) に保存してください。
+以下のjsonフォーマットのyour_api_key_hereの部分をDeepLのAPIキーに置き換えてください。
+
+  ```json
+  {
+      "api_key": "your_api_key_here"
+  }
+  ```
+- **英訳ボタン**  
+日本語プロンプトが完成した状態で「▼ プロンプトを英語に翻訳 ▼」ボタンをクリックすると、日本語の完成プロンプトが DeePL API を利用して英訳され、英訳結果が下部のテキスト領域に表示されます。  
+なお、日本語プロンプト欄が空欄、もしくはAPIキーが設定されていない場合は、エラーメッセージが表示されます。
+
+- **プロンプトのコピー**  
+完成したプロンプトはコピーボタンを押すことで、クリップボードにコピーすることができます。特に確認ダイアログなどは表示されませんので、素早く利用することができます。
+
+
+  
+
 
