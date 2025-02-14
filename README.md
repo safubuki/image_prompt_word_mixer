@@ -5,8 +5,8 @@
     <img src="./image/winter_tool.png" alt="Winter Tool" width="650"/>
     <p>Image Prompt Word-Mixerの画面</p>
     <p>▼</p>
-    <img src="./image/winter_gemini.png" alt="Winter Tool" height="200"/>
-    <img src="./image/winter_fx.png" alt="Winter Tool" height="200"/>
+    <img src="./image/winter_gemini.png" alt="Winter Gemini" height="200"/>
+    <img src="./image/winter_imagefx.png" alt="Winter ImageFX" height="200"/>
     <p>様々な生成AIツールに利用可能です！</p>
   </div>
 
