@@ -2,7 +2,7 @@
 **Image Prompt Word-Mixer**は、画像生成に使用するプロンプトのワードを自由に組み替えることで、さまざまなパターンの画像作成を支援するデスクトップアプリケーションです。
  
   <div align="center">
-    <img src="./image/winter_tool.png" alt="Winter Tool" width="550"/>
+    <img src="./image/winter_tool.png" alt="Winter Tool" width="650"/>
     <p>Image Prompt Word-Mixerの画面</p>
     <p>▼</p>
     <img src="./image/winter_gemini.png" alt="Winter Tool" height="200"/>
