@@ -81,7 +81,7 @@ Image Prompt Word-Mixer は、画像生成に使用するプロンプトのワ�
      - **default_variables**  
        テンプレート内に含まれる各プレースホルダの初期値を定義します。ユーザーはこの初期値を編集して、最終的なプロンプトを生成できます。
 
-   - **追加プロンプト (element_prompts.json)**
+   - **追加プロンプト ([element_prompts.json](element_prompts.json))**
 
      追加プロンプトは基本プロンプトに追加するオプション文章を管理します。今回、キー名が一部変更され、もともとの `prompts` が `prompt_lists` に、各プロンプトの名称が `name` から `title` に、そして `text` が `prompt` に変更されています。ファイル例:
 
