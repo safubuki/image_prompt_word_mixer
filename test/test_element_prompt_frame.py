@@ -133,3 +133,30 @@ def test_duplicate_prompt_titles(root, on_element_select, on_text_change):
     element_prompt_frame = ElementPromptFrame(root, duplicate_prompts, on_element_select,
                                               on_text_change)
     assert element_prompt_frame is not None
+
+
+def test_clear_selection(element_prompt_frame):
+    """
+    選択解除ボタンの機能テスト:
+    Treeview の選択が解除され、追加プロンプト表示欄がクリアされることを確認します。
+    """
+    # 必要なウィジェットを生成
+    element_prompt_frame.create_widgets()
+
+    # Treeview の先頭の項目を選択状態にする
+    children = element_prompt_frame.tree.get_children()
+    if children:
+        element_prompt_frame.tree.selection_set(children[0])
+
+    # Textウィジェットにサンプルテキストを設定
+    element_prompt_frame.element_text.insert("1.0", "Sample prompt text")
+
+    # clear_selection を呼び出す
+    element_prompt_frame.clear_selection()
+
+    # Treeview の選択が解除されていることを確認
+    assert not element_prompt_frame.tree.selection(), "Treeview の選択が解除されていません。"
+
+    # 追加プロンプト表示欄がクリアされていることを確認
+    text_content = element_prompt_frame.element_text.get("1.0", tk.END).strip()
+    assert text_content == "", "追加プロンプト表示欄がクリアされていません。"
