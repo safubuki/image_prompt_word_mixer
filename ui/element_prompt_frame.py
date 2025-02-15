@@ -34,7 +34,7 @@ class ElementPromptFrame(ttk.LabelFrame):
         UIウィジェットを生成し、レイアウトを設定します。
         """
         # 追加プロンプト選択部分
-        select_frame = ttk.LabelFrame(self, text="追加プロンプトを選択（複数可）")
+        select_frame = ttk.LabelFrame(self, text="追加プロンプトを選択（Ctrlキーで複数可）")
         select_frame.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nsew")
 
         # Subject入力欄
