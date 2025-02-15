@@ -3,9 +3,9 @@ template_manager.py
 プロンプトデータの読み込み、保存、更新および変数の置換機能を提供するコンポーネントです。
 """
 import json
+import sys
 import tkinter as tk
 from tkinter import messagebox
-import sys
 
 
 class TemplateManager:
@@ -42,20 +42,8 @@ class TemplateManager:
         except FileNotFoundError:
             root = tk.Tk()
             root.withdraw()  # メインウィンドウを表示しない
-            messagebox.showerror(
-                "Error", "jsonファイルをexeファイルと同じフォルダに用意してください。")
+            messagebox.showerror("Error", "jsonファイルをexeファイルと同じフォルダに用意してください。")
             sys.exit()  # Change exit() to sys.exit()
-
-    def save_prompts(self, filename, prompts):
-        """
-        プロンプトデータを指定されたJSONファイルに保存します。
-        
-        引数:
-            filename (str): 保存先のJSONファイルのパス
-            prompts (list): 保存するプロンプトのリスト
-        """
-        with open(filename, "w", encoding="utf-8") as file:
-            json.dump(prompts, file, ensure_ascii=False, indent=4)
 
     def get_basic_prompts(self):
         """
@@ -74,34 +62,6 @@ class TemplateManager:
             list: 要素プロンプトのリスト
         """
         return self.element_prompts
-
-    def update_basic_prompt(self, index, new_prompt):
-        """
-        指定されたインデックスの基本プロンプトを更新し、JSONファイルに保存します。
-        
-        引数:
-            index (int): 更新するプロンプトのインデックス
-            new_prompt (dict): 新しいプロンプトデータ
-        """
-        if 0 <= index < len(self.basic_prompts):
-            self.basic_prompts[index] = new_prompt
-            self.save_prompts(self.basic_prompt_file, self.basic_prompts)
-
-    def update_element_prompt(self, category, index, new_prompt):
-        """
-        指定されたカテゴリとインデックスの要素プロンプトを更新し、JSONファイルに保存します。
-        
-        引数:
-            category (str): 要素プロンプトのカテゴリ名
-            index (int): 更新するプロンプトのインデックス
-            new_prompt (dict): 新しいプロンプトデータ
-        """
-        for cat in self.element_prompts:
-            if cat["category"] == category:
-                if 0 <= index < len(cat["prompts"]):
-                    cat["prompts"][index] = new_prompt
-                    self.save_prompts(self.element_prompt_file, self.element_prompts)
-                    break
 
     def replace_variables(self, text, variables):
         """
