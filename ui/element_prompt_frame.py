@@ -52,10 +52,10 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.tree.column("#0", width=350)
         self.tree.bind("<<TreeviewSelect>>", self.on_element_select)
         for category in self.element_prompts:
-            parent = self.tree.insert("", tk.END, text=category["category"])
+            parent = self.tree.insert("", tk.END, text=category.get("category", ""))
             # キー名 "prompts" -> "prompt_lists"、"name" -> "title" に変更
-            for prompt in category["prompt_lists"]:
-                self.tree.insert(parent, tk.END, text=prompt["title"])
+            for prompt in category.get("prompt_lists", []):
+                self.tree.insert(parent, tk.END, text=prompt.get("title", ""))
 
         # 追加プロンプト表示部分
         display_frame = ttk.LabelFrame(self, text="追加プロンプトを表示")
