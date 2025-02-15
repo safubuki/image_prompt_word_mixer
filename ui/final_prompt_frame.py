@@ -3,11 +3,13 @@ final_prompt_frame.py
 完成プロンプト（基本＋追加）の表示、クリップボードへのコピー、およびDeePL APIを利用した英訳機能を提供するコンポーネントです。
 """
 
-import tkinter as tk
-from tkinter import ttk, messagebox
 import json
 import os
+import tkinter as tk
+from tkinter import messagebox, ttk
+
 import requests  # DeePL APIへのアクセスに利用
+
 
 class FinalPromptFrame(ttk.LabelFrame):
     """
@@ -33,7 +35,9 @@ class FinalPromptFrame(ttk.LabelFrame):
         self.final_text.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
         # プロンプトを英語に翻訳するボタン
-        translate_button = ttk.Button(self, text="▼ プロンプトを英語に翻訳 ▼", command=self.translate_to_english)
+        translate_button = ttk.Button(self,
+                                      text="▼ プロンプトを英語に翻訳 ▼",
+                                      command=self.translate_to_english)
         translate_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
         # 英訳結果を表示するテキスト領域
@@ -98,11 +102,7 @@ class FinalPromptFrame(ttk.LabelFrame):
             return
 
         url = "https://api-free.deepl.com/v2/translate"
-        params = {
-            "auth_key": api_key,
-            "text": jp_text,
-            "target_lang": "EN"
-        }
+        params = {"auth_key": api_key, "text": jp_text, "target_lang": "EN"}
         try:
             response = requests.post(url, data=params)
             response.raise_for_status()  # HTTPエラーがあれば例外を送出

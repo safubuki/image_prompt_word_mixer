@@ -2,8 +2,8 @@
 app.py
 Gemini Prompt Generatorアプリケーションの起動およびUI統合機能を提供するコンポーネントです。
 """
-import tkinter as tk
 import os  # osモジュールを追加
+import tkinter as tk
 
 from template_manager import TemplateManager
 from ui.basic_prompt_frame import BasicPromptFrame
@@ -141,6 +141,7 @@ class PromptGeneratorApp:
         self.final_frame.final_text.delete(1.0, tk.END)
         self.final_frame.final_text.insert(tk.END, final_prompt)
         self.final_frame.final_text.config(state=tk.DISABLED)
+
 
 if __name__ == "__main__":
     root = tk.Tk()
