@@ -36,8 +36,11 @@ class ElementPromptFrame(ttk.LabelFrame):
         # 追加プロンプト選択部分
         select_frame = ttk.LabelFrame(self, text="追加プロンプトを選択（Ctrlキーで複数可）")
         select_frame.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nsew")
+        # select_frame に2列設定（左：主語入力、右：選択解除ボタン）
+        select_frame.columnconfigure(0, weight=1)
+        select_frame.columnconfigure(1, weight=0)
 
-        # Subject入力欄
+        # Subject入力欄を含むフレーム（左側）
         subject_frame = ttk.Frame(select_frame)
         subject_frame.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         subject_label = ttk.Label(subject_frame, text="主語:")
@@ -46,9 +49,13 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.subject_entry.pack(side=tk.LEFT)
         self.subject_entry.insert(0, "被写体")  # 初期値設定
 
-        # 追加プロンプト選択用Treeview
+        # select_frame の右側に「選択解除」ボタンを配置
+        deselect_btn = ttk.Button(select_frame, text="選択解除", command=self.clear_selection)
+        deselect_btn.grid(row=0, column=1, padx=5, pady=5, sticky="e")
+
+        # 追加プロンプト選択用Treeview（下部に配置）
         self.tree = ttk.Treeview(select_frame, selectmode="extended", height=9)
-        self.tree.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
+        self.tree.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
         self.tree.column("#0", width=350)
         self.tree.bind("<<TreeviewSelect>>", self.on_element_select)
         for category in self.element_prompts:
@@ -63,3 +70,10 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.element_text = tk.Text(display_frame, height=7, width=50)
         self.element_text.grid(row=0, column=0, padx=5, pady=5)
         self.element_text.bind("<KeyRelease>", self.on_text_change)
+
+    def clear_selection(self):
+        """
+        Treeview の選択を解除し、追加プロンプト表示欄をクリアします。
+        """
+        self.tree.selection_remove(self.tree.selection())
+        self.element_text.delete("1.0", tk.END)
