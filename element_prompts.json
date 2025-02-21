@@ -1,29 +1,32 @@
-[
-    {
-        "category": "感情表現",
-        "prompt_lists": [
-            {"title": "笑っている", "prompt": "その{character}は、笑っています。"},
-            {"title": "悲しそう", "prompt": "その{character}は、悲しそうです。"},
-            {"title": "怒っている", "prompt": "その{character}は、怒っています。"},
-            {"title": "驚いている", "prompt": "その{character}は、驚いています。"}
-        ]
-    },
-    {
-        "category": "ポーズ",
-        "prompt_lists": [
-            {"title": "座ってくつろぐ", "prompt": "その{character}は、ゆったり座ってくつろいでいます。"},
-            {"title": "振り向く", "prompt": "その{character}は、後ろ姿をこちらに見せ、振り向いています。"},
-            {"title": "後ろ姿", "prompt": "その{character}は、後ろ姿をこちらに見せています。"},
-            {"title": "手を広げる", "prompt": "その{character}は、手を広げています。"}
-        ]
-    },
-    {
-        "category": "アクション",
-        "prompt_lists": [
-            {"title": "走っている", "prompt": "その{character}は、素早く走っている。"},
-            {"title": "ジャンプしている", "prompt": "その{character}は、ジャンプしています。"},
-            {"title": "クライミング", "prompt": "その{character}は、壁を登っています。"},
-            {"title": "飛んでいる", "prompt": "その{character}は、空を飛んでいます。"}
-        ]
-    }
-]
+{
+    "default_subject": "人物",
+    "categories": [
+        {
+            "category": "感情表現",
+            "prompt_lists": [
+                {"title": "笑っている", "prompt": "その{character}は、笑っています。"},
+                {"title": "悲しそう", "prompt": "その{character}は、悲しそうです。"},
+                {"title": "怒っている", "prompt": "その{character}は、怒っています。"},
+                {"title": "驚いている", "prompt": "その{character}は、驚いています。"}
+            ]
+        },
+        {
+            "category": "ポーズ",
+            "prompt_lists": [
+                {"title": "座ってくつろぐ", "prompt": "その{character}は、ゆったり座ってくつろいでいます。"},
+                {"title": "振り向く", "prompt": "その{character}は、後ろ姿をこちらに見せ、振り向いています。"},
+                {"title": "後ろ姿", "prompt": "その{character}は、後ろ姿をこちらに見せています。"},
+                {"title": "手を広げる", "prompt": "その{character}は、手を広げています。"}
+            ]
+        },
+        {
+            "category": "アクション",
+            "prompt_lists": [
+                {"title": "走っている", "prompt": "その{character}は、素早く走っている。"},
+                {"title": "ジャンプしている", "prompt": "その{character}は、ジャンプしています。"},
+                {"title": "クライミング", "prompt": "その{character}は、壁を登っています。"},
+                {"title": "飛んでいる", "prompt": "その{character}は、空を飛んでいます。"}
+            ]
+        }
+    ]
+}
