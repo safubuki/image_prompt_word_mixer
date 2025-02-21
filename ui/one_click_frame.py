@@ -116,8 +116,8 @@ class OneClickFrame(ttk.Frame):
         # リロードボタン
         refresh_btn = ttk.Button(button_panel, text="リロード", command=self.refresh_entries)
         refresh_btn.pack(side="top", fill="x", pady=(0, 5))
-        # 保存ボタン（名称を「保存」に変更）
-        save_btn = ttk.Button(button_panel, text="保存", command=self.save_current_entry)
+        # 保存ボタン（名称を「更新・保存」に変更）
+        save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
         save_btn.pack(side="top", fill="x")
 
         edit_frame.columnconfigure(1, weight=1)
