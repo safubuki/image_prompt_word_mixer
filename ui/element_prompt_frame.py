@@ -28,6 +28,9 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.on_element_select = on_element_select
         self.on_text_change = on_text_change
         self.create_widgets()
+        # ElementPromptFrame 自体のグリッド行と列に重みを設定して拡大を有効にする
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
 
     def create_widgets(self):
         """
@@ -53,27 +56,20 @@ class ElementPromptFrame(ttk.LabelFrame):
         deselect_btn = ttk.Button(select_frame, text="選択解除", command=self.clear_selection)
         deselect_btn.grid(row=0, column=1, padx=5, pady=5, sticky="e")
 
-        # 追加プロンプト選択用Treeview（下部に配置）
-        self.tree = ttk.Treeview(select_frame, selectmode="extended", height=9)
+        # Treeview部分（テキストボックス削除によりツリー表示領域を拡大）
+        self.tree = ttk.Treeview(select_frame, selectmode="extended")
         self.tree.grid(row=1, column=0, columnspan=2, padx=5, pady=5, sticky="nsew")
         self.tree.column("#0", width=350)
         self.tree.bind("<<TreeviewSelect>>", self.on_element_select)
         for category in self.element_prompts:
             parent = self.tree.insert("", tk.END, text=category.get("category", ""))
-            # キー名 "prompts" -> "prompt_lists"、"name" -> "title" に変更
             for prompt in category.get("prompt_lists", []):
                 self.tree.insert(parent, tk.END, text=prompt.get("title", ""))
-
-        # 追加プロンプト表示部分
-        display_frame = ttk.LabelFrame(self, text="追加プロンプトを表示")
-        display_frame.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nsew")
-        self.element_text = tk.Text(display_frame, height=7, width=50)
-        self.element_text.grid(row=0, column=0, padx=5, pady=5)
-        self.element_text.bind("<KeyRelease>", self.on_text_change)
+        # ツリー部分を拡大するため、select_frame の row 1 に weight を設定
+        select_frame.rowconfigure(1, weight=1)
 
     def clear_selection(self):
         """
-        Treeview の選択を解除し、追加プロンプト表示欄をクリアします。
+        Treeview の選択を解除します。
         """
         self.tree.selection_remove(self.tree.selection())
-        self.element_text.delete("1.0", tk.END)
