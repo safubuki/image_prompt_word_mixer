@@ -41,9 +41,9 @@ class PromptGeneratorApp:
         self.notebook = ttk.Notebook(self.master)
         self.notebook.pack(expand=1, fill="both")
 
-        # 「プロンプト」タブ用フレームを作成
+        # 「プロンプト作成」タブ用フレームを作成
         self.prompt_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.prompt_tab, text="プロンプト")
+        self.notebook.add(self.prompt_tab, text="プロンプト作成")
 
         # 「ワンクリック定型」タブ用フレームを作成 ← タイトルを変更
         self.one_click_tab = ttk.Frame(self.notebook)
