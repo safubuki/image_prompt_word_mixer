@@ -1,36 +1,39 @@
 """
 one_click_frame.py
-ワンクリックで実行できる機能（定型テキストを迅速にコピーする等）のUIを提供するコンポーネントです。
+ワンクリックで実行できる機能のUIを提供するコンポーネントです。
+この画面はボタンのみの画面で、ボタンには one_click.json で指定されたタイトルが表示され、
+ボタンをクリックすると、対応する定型文がクリップボードにコピーされ、画面下部の編集用テキストボックスに
+それぞれ「ボタンタイトル」と「定型文」が表示されます。これらは編集可能で、保存更新ボタンを押すと
+その内容で更新が保存され、即時ボタン表示も更新されます。
 """
-
 import json
 import os
 import tkinter as tk
 from tkinter import ttk
 
 
-class OneClickFrame(ttk.LabelFrame):
-    """
-    OneClickFrame クラスは、指定された定型テキストをワンクリックでコピーできるUIを提供します。
-    左側に編集可能なテキストウィジェット、右側にコピー用ボタンと保存ボタン（計16行）が縦に並びます。
-    """
-
+class OneClickFrame(ttk.Frame):
     def __init__(self, master, *args, **kwargs):
         """
         コンストラクタ
-        
+
         引数:
             master (tk.Widget): 親ウィジェット
         """
-        super().__init__(master, text="ワンクリック機能", *args, **kwargs)
-        self.one_click_texts = self.load_one_click_texts()
+        super().__init__(master, *args, **kwargs)
+        # one_click.jsonからエントリをロードする（エントリ数は16件）
+        self.one_click_entries = self.load_one_click_entries()
+        # 各ボタンの参照を保持（後でボタン表記更新に利用）
+        self.button_widgets = []
+        # 現在選択中のエントリのインデックス（初期状態は None）
+        self.current_index = None
         self.create_widgets()
 
-    def load_one_click_texts(self):
+    def load_one_click_entries(self):
         """
-        one_click.jsonから定型テキストを読み込みます。
-        読み込めない場合は、16行分の空文字列リストを返します。
-        期待するJSONの構造: 文字列のリスト
+        one_click.jsonからエントリを読み込みます。
+        読み込めない場合は、16件のデフォルトエントリ（空文字列）を返します。
+        期待するJSONの構造: オブジェクトのリスト [{"title": "ボタンタイトル", "text": "定型文"}, ...]
         """
         json_path = "one_click.json"
         if os.path.exists(json_path):
@@ -38,21 +41,27 @@ class OneClickFrame(ttk.LabelFrame):
                 with open(json_path, "r", encoding="utf-8") as f:
                     data = json.load(f)
                     if isinstance(data, list):
+                        for entry in data:
+                            if "title" not in entry:
+                                entry["title"] = ""
+                            if "text" not in entry:
+                                entry["text"] = ""
+                        # エントリ数が16件に満たなければ補完
                         while len(data) < 16:
-                            data.append("")
+                            data.append({"title": "", "text": ""})
                         return data[:16]
             except Exception as e:
                 print(f"one_click.json の読み込みに失敗しました: {e}")
-        return ["" for _ in range(16)]
+        return [{"title": "", "text": ""} for _ in range(16)]
 
-    def save_one_click_texts(self):
+    def save_one_click_entries(self):
         """
-        one_click_texts の内容を one_click.json に保存します。
+        現在の one_click_entries の内容を one_click.json に保存します。
         """
         json_path = "one_click.json"
         try:
             with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(self.one_click_texts, f, ensure_ascii=False, indent=4)
+                json.dump(self.one_click_entries, f, ensure_ascii=False, indent=4)
         except Exception as e:
             print(f"one_click.json の保存に失敗しました: {e}")
 
@@ -60,45 +69,81 @@ class OneClickFrame(ttk.LabelFrame):
         """
         UIウィジェットを生成します。
         """
-        container = ttk.Frame(self)
-        container.pack(padx=10, pady=10, fill="both", expand=True)
+        # 上部：ボタン群を配置するフレーム（2列×8行）
+        button_frame = ttk.Frame(self)
+        button_frame.pack(padx=10, pady=10, fill="both", expand=True)
+        # ボタンの配置（グリッドの各列に重みを与える）
+        button_frame.columnconfigure(0, weight=1)
+        button_frame.columnconfigure(1, weight=1)
 
-        self.text_widgets = []  # 各行のテキストウィジェットの参照
+        # 各エントリ分のボタンを生成（ボタンの参照はself.button_widgetsに保持）
+        for idx, entry in enumerate(self.one_click_entries):
+            row = idx // 2  # 2列の場合
+            col = idx % 2
+            btn = ttk.Button(button_frame, text=entry["title"],
+                             command=lambda index=idx: self.on_button_click(index))
+            btn.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
+            self.button_widgets.append(btn)
+            # 各行にも重みを設定してボタンが均等に広がるように
+            button_frame.rowconfigure(row, weight=1)
 
-        for i in range(16):
-            row_frame = ttk.Frame(container)
-            row_frame.grid(row=i, column=0, sticky="ew", pady=5)
-            # テキストウィジェット部分を拡張するための設定
-            row_frame.columnconfigure(0, weight=1)
+        # 下部：編集用エリア（タイトル用と定型文用テキストボックス、保存更新ボタン）
+        edit_frame = ttk.Frame(self)
+        edit_frame.pack(padx=10, pady=10, fill="x", expand=False)
+        # タイトル編集用テキストボックス（1行分）
+        title_label = ttk.Label(edit_frame, text="ボタンタイトル:")
+        title_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+        self.title_edit = tk.Text(edit_frame, height=1)
+        self.title_edit.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        
+        # 定型文編集用テキストボックス（5行分）
+        text_label = ttk.Label(edit_frame, text="定型文:")
+        text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
+        self.edit_text = tk.Text(edit_frame, height=5)
+        self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        
+        # 保存更新ボタン（編集内容を保存）
+        save_btn = ttk.Button(edit_frame, text="保存更新", command=self.save_current_entry)
+        save_btn.grid(row=1, column=2, padx=5, pady=5)
+        edit_frame.columnconfigure(1, weight=1)
 
-            # 左側：編集可能なテキストウィジェット（2行分表示、左右パディング均等）
-            text_widget = tk.Text(row_frame, height=2, wrap="none")
-            text_widget.grid(row=0, column=0, padx=(5, 5), sticky="ew")
-            text_widget.insert("1.0", self.one_click_texts[i])
-            self.text_widgets.append(text_widget)
-
-            # 右側：コピー用ボタン
-            copy_button = ttk.Button(row_frame, text="コピー", command=lambda idx=i: self.copy_text(idx))
-            copy_button.grid(row=0, column=1, padx=5)
-
-            # 右側：保存ボタン
-            save_button = ttk.Button(row_frame, text="保存", command=lambda idx=i: self.save_text(idx))
-            save_button.grid(row=0, column=2, padx=5)
-
-    def copy_text(self, idx):
+    def on_button_click(self, index):
         """
-        指定された行のテキストウィジェットの内容をクリップボードにコピーします。
-        コピー時に確認ダイアログは表示しません。
-        """
-        text_content = self.text_widgets[idx].get("1.0", tk.END).strip()
-        if text_content:
-            self.clipboard_clear()
-            self.clipboard_append(text_content)
+        ボタン押下時の処理
+        指定されたエントリの定型文とボタンタイトルをクリップボードにコピーし、
+        編集用テキストボックスに表示します。
 
-    def save_text(self, idx):
+        引数:
+            index (int): 選択されたエントリのインデックス
         """
-        指定された行のテキストウィジェットの内容を取得し、one_click_texts を更新してjsonに保存します。
+        self.current_index = index
+        entry = self.one_click_entries[index]
+        text_to_copy = entry["text"]
+        title_to_copy = entry["title"]
+        # クリップボードに定型文をコピー
+        self.clipboard_clear()
+        self.clipboard_append(text_to_copy)
+        # 編集用テキストボックスに表示（タイトルと定型文）
+        self.title_edit.delete("1.0", tk.END)
+        self.title_edit.insert(tk.END, title_to_copy)
+        self.edit_text.delete("1.0", tk.END)
+        self.edit_text.insert(tk.END, text_to_copy)
+
+    def save_current_entry(self):
         """
-        new_text = self.text_widgets[idx].get("1.0", tk.END).strip()
-        self.one_click_texts[idx] = new_text
-        self.save_one_click_texts()
+        編集用テキストボックスの内容を現在選択されているエントリに反映し、保存します。
+        ボタンタイトルと定型文の両方を更新して保存し、再度jsonを読み込み、
+        対応するボタンの表示を更新します。
+        """
+        if self.current_index is not None:
+            new_title = self.title_edit.get("1.0", tk.END).strip()
+            new_text = self.edit_text.get("1.0", tk.END).strip()
+            # 更新
+            self.one_click_entries[self.current_index]["title"] = new_title
+            self.one_click_entries[self.current_index]["text"] = new_text
+            # JSONに保存
+            self.save_one_click_entries()
+            # 再読み込みして最新状態に更新
+            self.one_click_entries = self.load_one_click_entries()
+            # 対応するボタンのタイトルを更新（リアルタイムに反映）
+            self.button_widgets[self.current_index].config(text=new_title)
