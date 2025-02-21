@@ -47,7 +47,7 @@ class PromptGeneratorApp:
 
         # 「ワンクリック定型」タブ用フレームを作成 ← タイトルを変更
         self.one_click_tab = ttk.Frame(self.notebook)
-        self.notebook.add(self.one_click_tab, text="ワンクリック定型")
+        self.notebook.add(self.one_click_tab, text="定型文簡単コピー")
 
         self.template_manager = TemplateManager("basic_prompts.json", "element_prompts.json")
         self.basic_prompts = self.template_manager.get_basic_prompts()
