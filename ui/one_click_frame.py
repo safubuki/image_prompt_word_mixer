@@ -66,6 +66,14 @@ class OneClickFrame(ttk.Frame):
         except Exception as e:
             print(f"one_click.json の保存に失敗しました: {e}")
 
+    def refresh_entries(self):
+        """
+        最新のone_click.jsonを読み込み、各ボタンの表示を更新します。
+        """
+        self.one_click_entries = self.load_one_click_entries()
+        for idx, entry in enumerate(self.one_click_entries):
+            self.button_widgets[idx].config(text=entry["title"])
+
     def create_widgets(self):
         """
         UIウィジェットを生成します。
@@ -88,20 +96,38 @@ class OneClickFrame(ttk.Frame):
             self.button_widgets.append(btn)
             button_frame.rowconfigure(row, weight=1)
 
-        # 下部：編集用エリア（タイトル用と定型文用テキストボックス、保存更新ボタン）はそのまま
+        # 下部：編集用エリア
         edit_frame = ttk.Frame(self)
         edit_frame.pack(padx=10, pady=10, fill="x", expand=False)
         title_label = ttk.Label(edit_frame, text="ボタンタイトル:")
         title_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.title_edit = tk.Text(edit_frame, height=1)
         self.title_edit.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
+        # TABキー押下時に定型文テキストボックスへフォーカス移動
+        self.title_edit.bind("<Tab>", self.move_focus_to_edit)
         text_label = ttk.Label(edit_frame, text="定型文:")
         text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.edit_text = tk.Text(edit_frame, height=5)
         self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        save_btn = ttk.Button(edit_frame, text="保存更新", command=self.save_current_entry)
-        save_btn.grid(row=1, column=2, padx=5, pady=5)
+
+        # ボタン群用の縦方向フレームを作成（右側に配置）
+        button_panel = ttk.Frame(edit_frame)
+        button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
+        # リロードボタン
+        refresh_btn = ttk.Button(button_panel, text="リロード", command=self.refresh_entries)
+        refresh_btn.pack(side="top", fill="x", pady=(0, 5))
+        # 保存ボタン（名称を「保存」に変更）
+        save_btn = ttk.Button(button_panel, text="保存", command=self.save_current_entry)
+        save_btn.pack(side="top", fill="x")
+
         edit_frame.columnconfigure(1, weight=1)
+
+    def move_focus_to_edit(self, event):
+        """
+        ボタンタイトルのテキストボックスでTABキーを押したときに、定型文テキストボックスにフォーカスを移動します。
+        """
+        self.edit_text.focus_set()
+        return "break"
 
     def on_button_click(self, index):
         """
