@@ -13,6 +13,7 @@ from tkinter import ttk
 
 
 class OneClickFrame(ttk.Frame):
+
     def __init__(self, master, *args, **kwargs):
         """
         コンストラクタ
@@ -32,7 +33,7 @@ class OneClickFrame(ttk.Frame):
     def load_one_click_entries(self):
         """
         one_click.jsonからエントリを読み込みます。
-        読み込めない場合は、16件のデフォルトエントリ（空文字列）を返します。
+        読み込めない場合は、20件のデフォルトエントリ（空文字列）を返します。
         期待するJSONの構造: オブジェクトのリスト [{"title": "ボタンタイトル", "text": "定型文"}, ...]
         """
         json_path = "one_click.json"
@@ -46,13 +47,13 @@ class OneClickFrame(ttk.Frame):
                                 entry["title"] = ""
                             if "text" not in entry:
                                 entry["text"] = ""
-                        # エントリ数が16件に満たなければ補完
-                        while len(data) < 16:
+                        # エントリ数が20件に満たなければ補完
+                        while len(data) < 20:
                             data.append({"title": "", "text": ""})
-                        return data[:16]
+                        return data[:20]
             except Exception as e:
                 print(f"one_click.json の読み込みに失敗しました: {e}")
-        return [{"title": "", "text": ""} for _ in range(16)]
+        return [{"title": "", "text": ""} for _ in range(20)]
 
     def save_one_click_entries(self):
         """
@@ -69,40 +70,35 @@ class OneClickFrame(ttk.Frame):
         """
         UIウィジェットを生成します。
         """
-        # 上部：ボタン群を配置するフレーム（2列×8行）
+        # 上部：ボタン群を配置するフレーム（2列×10行）
         button_frame = ttk.Frame(self)
         button_frame.pack(padx=10, pady=10, fill="both", expand=True)
-        # ボタンの配置（グリッドの各列に重みを与える）
+        # グリッド各列に重みを与える
         button_frame.columnconfigure(0, weight=1)
         button_frame.columnconfigure(1, weight=1)
 
-        # 各エントリ分のボタンを生成（ボタンの参照はself.button_widgetsに保持）
+        # 各エントリ分のボタンを生成（2列×10行、合計20個）
         for idx, entry in enumerate(self.one_click_entries):
-            row = idx // 2  # 2列の場合
+            row = idx // 2  # 0～9行になる
             col = idx % 2
-            btn = ttk.Button(button_frame, text=entry["title"],
+            btn = ttk.Button(button_frame,
+                             text=entry["title"],
                              command=lambda index=idx: self.on_button_click(index))
             btn.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
             self.button_widgets.append(btn)
-            # 各行にも重みを設定してボタンが均等に広がるように
             button_frame.rowconfigure(row, weight=1)
 
-        # 下部：編集用エリア（タイトル用と定型文用テキストボックス、保存更新ボタン）
+        # 下部：編集用エリア（タイトル用と定型文用テキストボックス、保存更新ボタン）はそのまま
         edit_frame = ttk.Frame(self)
         edit_frame.pack(padx=10, pady=10, fill="x", expand=False)
-        # タイトル編集用テキストボックス（1行分）
         title_label = ttk.Label(edit_frame, text="ボタンタイトル:")
         title_label.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         self.title_edit = tk.Text(edit_frame, height=1)
         self.title_edit.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
-        
-        # 定型文編集用テキストボックス（5行分）
         text_label = ttk.Label(edit_frame, text="定型文:")
         text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.edit_text = tk.Text(edit_frame, height=5)
         self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        
-        # 保存更新ボタン（編集内容を保存）
         save_btn = ttk.Button(edit_frame, text="保存更新", command=self.save_current_entry)
         save_btn.grid(row=1, column=2, padx=5, pady=5)
         edit_frame.columnconfigure(1, weight=1)
