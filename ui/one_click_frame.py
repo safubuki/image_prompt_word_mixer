@@ -113,12 +113,12 @@ class OneClickFrame(ttk.Frame):
         # ボタン群用の縦方向フレームを作成（右側に配置）
         button_panel = ttk.Frame(edit_frame)
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
-        # リロードボタン
-        refresh_btn = ttk.Button(button_panel, text="リロード", command=self.refresh_entries)
-        refresh_btn.pack(side="top", fill="x", pady=(0, 5))
-        # 保存ボタン（名称を「更新・保存」に変更）
+        # 更新・保存ボタン（上部）
         save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
         save_btn.pack(side="top", fill="x")
+        # Jsonリロードボタン（下部）
+        refresh_btn = ttk.Button(button_panel, text="Jsonリロード", command=self.refresh_entries)
+        refresh_btn.pack(side="top", fill="x", pady=(5, 0))
 
         edit_frame.columnconfigure(1, weight=1)
 
