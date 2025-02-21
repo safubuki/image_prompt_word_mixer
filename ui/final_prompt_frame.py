@@ -30,8 +30,8 @@ class FinalPromptFrame(ttk.LabelFrame):
         """
         UIウィジェットを生成し、レイアウトを設定します。
         """
-        # 完成プロンプト表示用テキスト領域
-        self.final_text = tk.Text(self, height=7, width=109, state="disabled")
+        # 完成プロンプト表示用テキスト領域（編集可能）
+        self.final_text = tk.Text(self, height=7, width=109)
         self.final_text.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
 
         # プロンプトを英語に翻訳するボタン
@@ -40,7 +40,7 @@ class FinalPromptFrame(ttk.LabelFrame):
                                       command=self.translate_to_english)
         translate_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
 
-        # 英訳結果を表示するテキスト領域
+        # 英訳結果を表示するテキスト領域（読み取り専用のまま）
         self.english_text = tk.Text(self, height=7, width=109, state="disabled")
         self.english_text.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
 

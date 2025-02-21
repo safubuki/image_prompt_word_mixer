@@ -114,7 +114,8 @@ class PromptGeneratorApp:
                     category_index = parent_ids.index(parent)
                 except ValueError:
                     continue
-                category_data = self.element_prompts[category_index]
+                # JSON構造が dict になったため、"categories" キーを追加して取得
+                category_data = self.element_prompts["categories"][category_index]
                 item_text = self.element_frame.tree.item(item, "text")
                 for prompt in category_data["prompt_lists"]:
                     if prompt["title"] == item_text:
@@ -146,6 +147,7 @@ class PromptGeneratorApp:
             self.master.after_cancel(self.update_timer)
         self.update_timer = self.master.after(1000, self.generate_final_prompt)
 
+    # 以下、generate_final_prompt 関数の変更例
     def generate_final_prompt(self):
         """
         基本プロンプトと追加プロンプトを結合して完成プロンプトを生成します。
@@ -156,10 +158,8 @@ class PromptGeneratorApp:
         element_text = self.element_frame.element_text.get(1.0, tk.END).strip()
         final_prompt += "\n" + element_text
 
-        self.final_frame.final_text.config(state=tk.NORMAL)
         self.final_frame.final_text.delete(1.0, tk.END)
         self.final_frame.final_text.insert(tk.END, final_prompt)
-        self.final_frame.final_text.config(state=tk.DISABLED)
 
 
 if __name__ == "__main__":
