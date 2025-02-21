@@ -109,8 +109,8 @@ class PromptGeneratorApp:
         subject_val = self.element_frame.subject_entry.get().strip()
         element_prompt_final = self.template_manager.replace_variables(
             element_prompt_raw, {"character": subject_val})
-        self.element_frame.element_text.delete(1.0, tk.END)
-        self.element_frame.element_text.insert(tk.END, element_prompt_final)
+        # element_textウィジェットではなく、取得したテキストを保持
+        self.element_prompt_content = element_prompt_final
         self.schedule_update()
 
     def on_text_change(self, _):
@@ -134,7 +134,8 @@ class PromptGeneratorApp:
         basic_text = self.basic_frame.basic_text.get(1.0, tk.END).strip()
         variables = {var: entry.get() for var, entry in self.basic_frame.variable_entries.items()}
         final_prompt = self.template_manager.replace_variables(basic_text, variables)
-        element_text = self.element_frame.element_text.get(1.0, tk.END).strip()
+        # ElementPromptFrame からは element_text が得られないので、保持している element_prompt_content を利用
+        element_text = getattr(self, 'element_prompt_content', '')
         final_prompt += "\n" + element_text
 
         self.final_frame.final_text.config(state=tk.NORMAL)
