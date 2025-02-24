@@ -35,7 +35,8 @@ class PromptGeneratorApp:
         except tk.TclError:
             print(f"アイコンファイルが見つかりませんでした: {icon_path}")
 
-        self.master.resizable(True, True)
+        # Fix: ウィンドウサイズを固定
+        self.master.resizable(False, False)
 
         # Notebook（タブ）を作成
         self.notebook = ttk.Notebook(self.master)
