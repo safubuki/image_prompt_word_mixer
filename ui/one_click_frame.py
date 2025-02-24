@@ -91,7 +91,8 @@ class OneClickFrame(ttk.Frame):
             col = idx % 2
             btn = ttk.Button(button_frame,
                              text=entry["title"],
-                             command=lambda index=idx: self.on_button_click(index))
+                             width=20,  # fixed width added
+                             command=self.create_button_command(idx))
             btn.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
             self.button_widgets.append(btn)
             button_frame.rowconfigure(row, weight=1)
@@ -121,6 +122,15 @@ class OneClickFrame(ttk.Frame):
         refresh_btn.pack(side="top", fill="x", pady=(5, 0))
 
         edit_frame.columnconfigure(1, weight=1)
+
+    def create_button_command(self, index):
+        """
+        ボタンのコマンドを生成します。
+
+        引数:
+            index (int): ボタンのインデックス
+        """
+        return lambda: self.on_button_click(index)
 
     def move_focus_to_edit(self, event):
         """

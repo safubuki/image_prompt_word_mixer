@@ -65,7 +65,12 @@ class BasicPromptFrame(ttk.LabelFrame):
         for widget in self.variable_frame.winfo_children():
             widget.destroy()
         self.variable_entries.clear()
-
+        
+        # 固定高さを設定し、変数数に依存して高さが変わらないようにする（例: 200ピクセルに変更）
+        fixed_height = 180  # 高さを増やして3行目が見切れないように調整
+        self.variable_frame.config(height=fixed_height)
+        self.variable_frame.grid_propagate(False)
+        
         # 列設定：左と右の2列、中央にスペーサーを配置
         self.variable_frame.columnconfigure(0, weight=1)
         self.variable_frame.columnconfigure(1, minsize=20)
