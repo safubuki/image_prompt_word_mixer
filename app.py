@@ -125,9 +125,9 @@ class PromptGeneratorApp:
         """
         APIキー設定ダイアログ:
           - APIキー情報をapi_key.jsonから読み込み、表示します
-          - ユーザーが新たなAPIキーを入力後、json形式で保存します
-        
-        設定内容は、外部API利用時に必要な認証情報として活用されます。
+          - ユーザーが新たなAPIキーを入力後、json形式で保存し、設定を即時反映します
+          
+          設定内容は、外部API利用時に必要な認証情報として活用されます。
         """
         dialog = tk.Toplevel(self.master)
         dialog.title("APIキー設定")
@@ -149,11 +149,28 @@ class PromptGeneratorApp:
             try:
                 with open("api_key.json", "w", encoding="utf-8") as f:
                     json.dump({"api_key": new_key}, f, ensure_ascii=False, indent=4)
+                # 追加: api_key.jsonを再読み込みして設定を反映
+                self.reload_api_key()
                 dialog.destroy()
             except Exception as e:
                 messagebox.showerror("エラー", f"保存に失敗しました: {e}")
         tk.Button(button_frame, text="保存", command=save_api_key).pack(side="left", padx=5)
         tk.Button(button_frame, text="キャンセル", command=dialog.destroy).pack(side="left", padx=5)
+
+    def reload_api_key(self):
+        """
+        APIキーの再読み込み:
+          - api_key.jsonから最新のAPIキーを取得し、内部プロパティに反映させます
+          - これにより、保存直後からDeeplへのアクセスが可能となります
+        """
+        try:
+            with open("api_key.json", "r", encoding="utf-8") as f:
+                data = json.load(f)
+            self.deepl_api_key = data.get("api_key", "")
+            # オプション: APIキー再設定時の通知やログ出力を実施
+            print("APIキーがリロードされました。")
+        except Exception as e:
+            print(f"APIキーのリロードに失敗しました: {e}")
 
     def reload_json(self):
         """
