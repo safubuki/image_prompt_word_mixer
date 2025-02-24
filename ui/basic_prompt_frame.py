@@ -10,6 +10,16 @@ from tkinter import ttk
 class BasicPromptFrame(ttk.LabelFrame):
     """
     BasicPromptFrame クラスは、基本プロンプトの選択、テンプレート表示および変数入力を提供するコンポーネントです。
+    
+    引数:
+      master (tk.Widget): 親ウィジェット
+      basic_prompts (list): 基本プロンプトのデータリスト
+      on_basic_select (function): コンボボックス選択時のコールバック関数
+      on_text_change (function): テキスト変更時のコールバック関数
+      *args, **kwargs: その他
+     
+    戻り値:
+      なし
     """
 
     def __init__(self, master, basic_prompts, on_basic_select, on_text_change, *args, **kwargs):
@@ -17,11 +27,14 @@ class BasicPromptFrame(ttk.LabelFrame):
         コンストラクタ
         
         引数:
-            master (tk.Widget): 親ウィジェット
-            basic_prompts (list): 基本プロンプトのデータリスト
-            on_basic_select (function): コンボボックス選択時のコールバック関数
-            on_text_change (function): テキスト変更時のコールバック関数
-            *args, **kwargs: その他の引数
+          master (tk.Widget): 親ウィジェット
+          basic_prompts (list): 基本プロンプトのデータリスト
+          on_basic_select (function): コンボボックス選択時のコールバック関数
+          on_text_change (function): テキスト変更時のコールバック関数
+          *args, **kwargs: その他
+          
+        戻り値:
+          なし
         """
         super().__init__(master, text="基本プロンプト", *args, **kwargs)
         self.basic_prompts = basic_prompts
@@ -33,8 +46,27 @@ class BasicPromptFrame(ttk.LabelFrame):
     def create_widgets(self):
         """
         UIウィジェットを生成し、レイアウトを設定します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
         """
-        # 基本プロンプト選択部分
+        self.create_basic_select_frame()
+        self.create_template_frame()
+        self.create_variable_frame()
+
+    def create_basic_select_frame(self):
+        """
+        基本プロンプト選択部分のウィジェットを生成します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
         basic_select_frame = ttk.LabelFrame(self, text="基本プロンプトを選択")
         basic_select_frame.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nsew")
         self.basic_combobox = ttk.Combobox(basic_select_frame,
@@ -42,15 +74,33 @@ class BasicPromptFrame(ttk.LabelFrame):
                                            width=48)
         self.basic_combobox.grid(row=0, column=0, padx=5, pady=5)
         self.basic_combobox.bind("<<ComboboxSelected>>", self.on_basic_select)
-
-        # 基本プロンプトテキスト表示部分
+    
+    def create_template_frame(self):
+        """
+        基本プロンプトテンプレート表示部分のウィジェットを生成します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
         template_frame = ttk.LabelFrame(self, text="基本プロンプト テンプレート表示")
         template_frame.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nsew")
         self.basic_text = tk.Text(template_frame, height=10, width=50)
         self.basic_text.grid(row=0, column=0, padx=5, pady=5)
         self.basic_text.bind("<KeyRelease>", self.on_text_change)
-
-        # 変数設定部分
+    
+    def create_variable_frame(self):
+        """
+        変数設定部分のウィジェットを生成します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
         self.variable_frame = ttk.LabelFrame(self, text="変数設定")
         self.variable_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
 
@@ -59,7 +109,10 @@ class BasicPromptFrame(ttk.LabelFrame):
         変数入力欄を更新します。
         
         引数:
-            variables (dict): プロンプトに含まれる変数とその初期値の辞書
+          variables (dict): プロンプトに含まれる変数とその初期値の辞書
+          
+        戻り値:
+          なし
         """
         # 既存ウィジェットの削除
         for widget in self.variable_frame.winfo_children():

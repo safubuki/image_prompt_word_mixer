@@ -10,6 +10,16 @@ from tkinter import ttk
 class ElementPromptFrame(ttk.LabelFrame):
     """
     ElementPromptFrame クラスは、追加プロンプトの選択と表示機能を提供するコンポーネントです。
+    
+    引数:
+      master (tk.Widget): 親ウィジェット
+      element_prompts (dict): 追加プロンプトのデータ（"default_subject" と "categories" を含む）
+      on_element_select (function): ツリービュー選択時のコールバック関数
+      on_text_change (function): テキスト変更時のコールバック関数
+      *args, **kwargs: その他
+      
+    戻り値:
+      なし
     """
 
     def __init__(self, master, element_prompts, on_element_select, on_text_change, *args, **kwargs):
@@ -17,11 +27,14 @@ class ElementPromptFrame(ttk.LabelFrame):
         コンストラクタ
         
         引数:
-            master (tk.Widget): 親ウィジェット
-            element_prompts (dict): 追加プロンプトのデータ（"default_subject" と "categories" を含む）
-            on_element_select (function): ツリービュー選択時のコールバック関数
-            on_text_change (function): テキスト変更時のコールバック関数
-            *args, **kwargs: その他の引数
+          master (tk.Widget): 親ウィジェット
+          element_prompts (dict): 追加プロンプトのデータ
+          on_element_select (function): ツリービュー選択時のコールバック関数
+          on_text_change (function): テキスト変更時のコールバック関数
+          *args, **kwargs: その他
+          
+        戻り値:
+          なし
         """
         # element_prompts は辞書となっているため、default_subject と categories に分ける
         self.default_subject = element_prompts.get("default_subject", "被写体")
@@ -37,15 +50,31 @@ class ElementPromptFrame(ttk.LabelFrame):
     def create_widgets(self):
         """
         UIウィジェットを生成し、レイアウトを設定します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
         """
-        # 追加プロンプト選択部分
+        self.create_select_frame()
+
+    def create_select_frame(self):
+        """
+        追加プロンプト選択部分のウィジェットを生成します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
         select_frame = ttk.LabelFrame(self, text="追加プロンプトを選択（Ctrlキーで複数可）")
         select_frame.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nsew")
-        # select_frame に2列設定（左：主語入力、右：選択解除ボタン）
         select_frame.columnconfigure(0, weight=1)
         select_frame.columnconfigure(1, weight=0)
 
-        # Subject入力欄を含むフレーム（左側）
+        # 主語入力部
         subject_frame = ttk.Frame(select_frame)
         subject_frame.grid(row=0, column=0, padx=5, pady=5, sticky="w")
         subject_label = ttk.Label(subject_frame, text="主語:")
@@ -74,5 +103,11 @@ class ElementPromptFrame(ttk.LabelFrame):
     def clear_selection(self):
         """
         Treeview の選択を解除します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
         """
         self.tree.selection_remove(self.tree.selection())
