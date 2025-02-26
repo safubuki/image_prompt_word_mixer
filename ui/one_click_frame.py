@@ -118,6 +118,7 @@ class OneClickFrame(ttk.Frame):
         text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.edit_text = tk.Text(edit_frame, height=5)
         self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        # ボタンパネルの作成
         button_panel = ttk.Frame(edit_frame)
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
         save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
@@ -125,6 +126,12 @@ class OneClickFrame(ttk.Frame):
         refresh_btn = ttk.Button(button_panel, text="Jsonリロード", command=self.refresh_entries)
         refresh_btn.pack(side="top", fill="x", pady=(5, 0))
         edit_frame.columnconfigure(1, weight=1)
+        # ※矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
+        hint_label = ttk.Label(edit_frame,
+                               text="※矢印キーでボタン位置を移動できます",
+                               font=("Arial", 8),
+                               foreground="gray")
+        hint_label.grid(row=2, column=1, sticky="e", padx=5, pady=(2, 0))
 
     def load_one_click_entries(self):
         """
