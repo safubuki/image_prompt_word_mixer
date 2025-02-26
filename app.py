@@ -78,6 +78,10 @@ class PromptGeneratorApp:
                               command=lambda: self.open_json_editor("basic_prompts.json"))
         file_menu.add_command(label="追加プロンプト(element_prompts.json)を開く",
                               command=lambda: self.open_json_editor("element_prompts.json"))
+        file_menu.add_command(label="定型文ファイル(one_click.json)を開く",
+                              command=lambda: self.open_json_editor("one_click.json"))
+        # 定型文ファイルの後、区切り線を追加
+        file_menu.add_separator()
         # リロード機能を統合して全設定ファイルをリロード
         file_menu.add_command(label="全ての設定ファイルをリロード", command=self.reload_json)
         menubar.add_cascade(label="ファイル", menu=file_menu)
