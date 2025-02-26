@@ -74,16 +74,16 @@ class PromptGeneratorApp:
         """
         menubar = tk.Menu(self.master)
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="基本プロンプト(basic_prompts.json)を開く",
+        file_menu.add_command(label="基本プロンプト編集",
                               command=lambda: self.open_json_editor("basic_prompts.json"))
-        file_menu.add_command(label="追加プロンプト(element_prompts.json)を開く",
+        file_menu.add_command(label="追加プロンプト編集",
                               command=lambda: self.open_json_editor("element_prompts.json"))
-        file_menu.add_command(label="定型文ファイル(one_click.json)を開く",
+        file_menu.add_command(label="定型文編集",
                               command=lambda: self.open_json_editor("one_click.json"))
         # 定型文ファイルの後、区切り線を追加
         file_menu.add_separator()
-        # リロード機能を統合して全設定ファイルをリロード
-        file_menu.add_command(label="全ての設定ファイルをリロード", command=self.reload_json)
+        # 編集結果反映機能を統合して全設定ファイルを反映
+        file_menu.add_command(label="編集内容を反映", command=self.reload_json)
         menubar.add_cascade(label="ファイル", menu=file_menu)
         setting_menu = tk.Menu(menubar, tearoff=0)
         setting_menu.add_command(label="APIキー設定", command=self.open_api_key_dialog)
@@ -215,9 +215,9 @@ class PromptGeneratorApp:
             with open("api_key.json", "r", encoding="utf-8") as f:
                 data = json.load(f)
             self.deepl_api_key = data.get("api_key", "")
-            print("APIキーがリロードされました。")
+            print("APIキーを設定しました。")
         except Exception as e:
-            print(f"APIキーのリロードに失敗しました: {e}")
+            print(f"APIキーの設定に失敗しました: {e}")
 
     def reload_json(self):
         """
@@ -230,7 +230,7 @@ class PromptGeneratorApp:
           なし
         """
         try:
-            # 既存の基本プロンプト、追加プロンプトのリロード
+            # 既存の基本プロンプト、追加プロンプトの反映
             self.template_manager.basic_prompts = self.template_manager.load_prompts(
                 self.template_manager.basic_prompt_file)
             self.template_manager.element_prompts = self.template_manager.load_prompts(
@@ -240,11 +240,11 @@ class PromptGeneratorApp:
             self.basic_frame.basic_combobox['values'] = [p["name"] for p in self.basic_prompts]
             self.basic_frame.basic_combobox.current(0)
             self.on_basic_select(None)
-            # one_click_frame のエントリーもリロード
+            # one_click_frame のエントリーも反映
             self.one_click_frame.refresh_entries()
-            messagebox.showinfo("情報", "全ての設定ファイルがリロードされました。")
+            messagebox.showinfo("情報", "全ての編集結果が反映されました。")
         except Exception as e:
-            messagebox.showerror("エラー", f"リロードに失敗しました: {e}")
+            messagebox.showerror("エラー", f"編集結果の反映に失敗しました: {e}")
 
     def set_default_prompt(self):
         """
