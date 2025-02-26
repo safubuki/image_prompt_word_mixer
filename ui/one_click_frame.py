@@ -38,6 +38,11 @@ class OneClickFrame(ttk.Frame):
         self.current_category = None
         self.current_index = None
         self.create_widgets()
+        # 上下左右キーでボタン位置移動のバインド
+        self.bind_all("<Up>", lambda event: self.move_selected_button("up"))
+        self.bind_all("<Down>", lambda event: self.move_selected_button("down"))
+        self.bind_all("<Left>", lambda event: self.move_selected_button("left"))
+        self.bind_all("<Right>", lambda event: self.move_selected_button("right"))
 
     def create_widgets(self):
         """
@@ -273,3 +278,58 @@ class OneClickFrame(ttk.Frame):
             self.save_one_click_entries()
             self.one_click_entries = self.load_one_click_entries()
             self.button_widgets[self.current_category][self.current_index].config(text=new_title)
+
+    def move_selected_button(self, direction):
+        """
+        上下左右キー押下時に、選択中のボタン位置を移動します。
+        移動先が有効な場合、one_click_entries の該当エントリーの位置を入れ替え、
+        ボタン表示および json 保存データの順序も更新します。
+        
+        引数:
+          direction (str): "up"、"down"、"left"、"right"
+        
+        戻り値:
+          なし
+        """
+        if self.current_category is None or self.current_index is None:
+            return
+
+        target_index = self.get_target_index(self.current_index, direction)
+        if target_index is None:
+            return
+
+        # one_click_entries 内のエントリーを入れ替え
+        entries = self.one_click_entries[self.current_category]
+        entries[self.current_index], entries[target_index] = entries[target_index], entries[
+            self.current_index]
+        # ボタンウィジェットの表示内容を更新
+        buttons = self.button_widgets[self.current_category]
+        buttons[self.current_index].config(text=entries[self.current_index]["title"])
+        buttons[target_index].config(text=entries[target_index]["title"])
+
+        # 選択中のインデックスを更新し、変更内容を保存
+        self.current_index = target_index
+        self.save_one_click_entries()
+
+    def get_target_index(self, current, direction):
+        """
+        現在のインデックスから指定された方向への移動先インデックスを計算します。（2列グリッドを前提）
+        
+        引数:
+          current (int): 現在のインデックス
+          direction (str): "up"、"down"、"left"、"right"
+        
+        戻り値:
+          int または None: 新しいインデックス。移動できない場合は None を返す
+        """
+        if direction == "up":
+            new_index = current - 2 if current >= 2 else None
+        elif direction == "down":
+            new_index = current + 2 if current + 2 < DEFAULT_ENTRY_COUNT else None
+        elif direction == "left":
+            new_index = current - 1 if current % 2 == 1 else None
+        elif direction == "right":
+            new_index = current + 1 if current % 2 == 0 and current + 1 < DEFAULT_ENTRY_COUNT else None
+        else:
+            new_index = None
+        return new_index
