@@ -1,7 +1,7 @@
 """
 one_click_frame.py
 ワンクリックで実行できる機能のUIを提供するコンポーネントです。
-この画面ではタブでカテゴリ（例: ポーズ、表情、品質向上）を分類し、
+この画面ではタブでカテゴリ（例: 良く使う、表情、品質向上）を分類し、
 各タブ内に従来の定型文コピー機能を配置します。
 ボタンをクリックすると該当エントリーのタイトルと定型文が編集領域に反映され、
 クリップボードへコピーされます。
@@ -13,7 +13,7 @@ import tkinter as tk
 from tkinter import ttk
 
 DEFAULT_ENTRY_COUNT = 20
-DEFAULT_CATEGORIES = ["ポーズ", "表情", "品質向上"]
+DEFAULT_CATEGORIES = ["よく使う", "表情", "品質向上"]
 
 
 class OneClickFrame(ttk.Frame):
