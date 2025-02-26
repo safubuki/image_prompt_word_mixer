@@ -25,6 +25,7 @@ class PromptGeneratorApp:
     戻り値:
       なし
     """
+
     def __init__(self, master):
         """
         コンストラクタ
@@ -77,7 +78,8 @@ class PromptGeneratorApp:
                               command=lambda: self.open_json_editor("basic_prompts.json"))
         file_menu.add_command(label="追加プロンプト(element_prompts.json)を開く",
                               command=lambda: self.open_json_editor("element_prompts.json"))
-        file_menu.add_command(label="基本・追加プロンプトJsonをリロード", command=self.reload_json)
+        # リロード機能を統合して全設定ファイルをリロード
+        file_menu.add_command(label="全ての設定ファイルをリロード", command=self.reload_json)
         menubar.add_cascade(label="ファイル", menu=file_menu)
         setting_menu = tk.Menu(menubar, tearoff=0)
         setting_menu.add_command(label="APIキー設定", command=self.open_api_key_dialog)
@@ -168,7 +170,8 @@ class PromptGeneratorApp:
         """
         dialog = tk.Toplevel(self.master)
         dialog.title("APIキー設定")
-        tk.Label(dialog, text="DeepLのAPIキーを設定してください。\n保存ボタンを押すとapi_key.jsonに保存します。").pack(padx=10, pady=5)
+        tk.Label(dialog, text="DeepLのAPIキーを設定してください。\n保存ボタンを押すとapi_key.jsonに保存します。").pack(padx=10,
+                                                                                          pady=5)
         entry = tk.Entry(dialog, width=50)
         entry.pack(padx=10, pady=5)
         try:
@@ -180,6 +183,7 @@ class PromptGeneratorApp:
         entry.insert(0, current_key)
         button_frame = tk.Frame(dialog)
         button_frame.pack(pady=5)
+
         def save_api_key():
             new_key = entry.get()
             try:
@@ -189,6 +193,7 @@ class PromptGeneratorApp:
                 dialog.destroy()
             except Exception as e:
                 messagebox.showerror("エラー", f"保存に失敗しました: {e}")
+
         tk.Button(button_frame, text="保存", command=save_api_key).pack(side="left", padx=5)
         tk.Button(button_frame, text="キャンセル", command=dialog.destroy).pack(side="left", padx=5)
 
@@ -221,16 +226,21 @@ class PromptGeneratorApp:
           なし
         """
         try:
-            self.template_manager.basic_prompts = self.template_manager.load_prompts(self.template_manager.basic_prompt_file)
-            self.template_manager.element_prompts = self.template_manager.load_prompts(self.template_manager.element_prompt_file)
+            # 既存の基本プロンプト、追加プロンプトのリロード
+            self.template_manager.basic_prompts = self.template_manager.load_prompts(
+                self.template_manager.basic_prompt_file)
+            self.template_manager.element_prompts = self.template_manager.load_prompts(
+                self.template_manager.element_prompt_file)
             self.basic_prompts = self.template_manager.get_basic_prompts()
             self.element_prompts = self.template_manager.get_element_prompts()
             self.basic_frame.basic_combobox['values'] = [p["name"] for p in self.basic_prompts]
             self.basic_frame.basic_combobox.current(0)
             self.on_basic_select(None)
-            messagebox.showinfo("情報", "Jsonファイルがリロードされました。")
+            # one_click_frame のエントリーもリロード
+            self.one_click_frame.refresh_entries()
+            messagebox.showinfo("情報", "全ての設定ファイルがリロードされました。")
         except Exception as e:
-            messagebox.showerror("エラー", f"Jsonのリロードに失敗しました: {e}")
+            messagebox.showerror("エラー", f"リロードに失敗しました: {e}")
 
     def set_default_prompt(self):
         """
@@ -343,6 +353,7 @@ class PromptGeneratorApp:
         final_prompt += "\n" + element_text
         self.final_frame.final_text.delete(1.0, tk.END)
         self.final_frame.final_text.insert(tk.END, final_prompt)
+
 
 if __name__ == "__main__":
     root = tk.Tk()

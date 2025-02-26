@@ -123,8 +123,7 @@ class OneClickFrame(ttk.Frame):
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
         save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
         save_btn.pack(side="top", fill="x")
-        refresh_btn = ttk.Button(button_panel, text="Jsonリロード", command=self.refresh_entries)
-        refresh_btn.pack(side="top", fill="x", pady=(5, 0))
+        # ※リロードボタンはapp.py側に統合するため削除
         edit_frame.columnconfigure(1, weight=1)
         # ※矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
         hint_label = ttk.Label(edit_frame,
