@@ -34,11 +34,76 @@ class OneClickFrame(ttk.Frame):
         # 各カテゴリごとのボタンウィジェットを格納する辞書
         self.button_widgets = {}
         self.create_widgets()
-        # 上下左右キーでボタン位置移動のバインド
-        self.bind_all("<Up>", lambda event: self.move_selected_button("up"))
-        self.bind_all("<Down>", lambda event: self.move_selected_button("down"))
-        self.bind_all("<Left>", lambda event: self.move_selected_button("left"))
-        self.bind_all("<Right>", lambda event: self.move_selected_button("right"))
+        
+        # キーバインディングを修正して、テキストボックスにフォーカスがない時のみ動作するよう変更
+        self.bind_all("<Up>", self.handle_up_key)
+        self.bind_all("<Down>", self.handle_down_key)
+        self.bind_all("<Left>", self.handle_left_key)
+        self.bind_all("<Right>", self.handle_right_key)
+
+    def handle_up_key(self, event):
+        """
+        上矢印キーのイベントハンドラ。テキストボックスにフォーカスがない時のみ処理する。
+        
+        引数:
+          event: キーイベント
+          
+        戻り値:
+          なし
+        """
+        # フォーカスがテキストボックスにあるか確認
+        focused = self.master.focus_get()
+        if isinstance(focused, tk.Text):
+            return  # テキストボックスにフォーカスがある場合は何もしない
+        self.move_selected_button("up")
+
+    def handle_down_key(self, event):
+        """
+        下矢印キーのイベントハンドラ。テキストボックスにフォーカスがない時のみ処理する。
+        
+        引数:
+          event: キーイベント
+          
+        戻り値:
+          なし
+        """
+        # フォーカスがテキストボックスにあるか確認
+        focused = self.master.focus_get()
+        if isinstance(focused, tk.Text):
+            return  # テキストボックスにフォーカスがある場合は何もしない
+        self.move_selected_button("down")
+
+    def handle_left_key(self, event):
+        """
+        左矢印キーのイベントハンドラ。テキストボックスにフォーカスがない時のみ処理する。
+        
+        引数:
+          event: キーイベント
+          
+        戻り値:
+          なし
+        """
+        # フォーカスがテキストボックスにあるか確認
+        focused = self.master.focus_get()
+        if isinstance(focused, tk.Text):
+            return  # テキストボックスにフォーカスがある場合は何もしない
+        self.move_selected_button("left")
+
+    def handle_right_key(self, event):
+        """
+        右矢印キーのイベントハンドラ。テキストボックスにフォーカスがない時のみ処理する。
+        
+        引数:
+          event: キーイベント
+          
+        戻り値:
+          なし
+        """
+        # フォーカスがテキストボックスにあるか確認
+        focused = self.master.focus_get()
+        if isinstance(focused, tk.Text):
+            return  # テキストボックスにフォーカスがある場合は何もしない
+        self.move_selected_button("right")
 
     def create_widgets(self):
         """
@@ -110,10 +175,20 @@ class OneClickFrame(ttk.Frame):
         self.title_edit = tk.Text(edit_frame, height=1)
         self.title_edit.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         self.title_edit.bind("<Tab>", self.move_focus_to_edit)
+        
+        # テキストボックスにフォーカス状態変更コールバックを追加
+        self.title_edit.bind("<FocusIn>", self.on_text_focus_in)
+        self.title_edit.bind("<FocusOut>", self.on_text_focus_out)
+        
         text_label = ttk.Label(edit_frame, text="定型文:")
         text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.edit_text = tk.Text(edit_frame, height=5)
         self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
+        
+        # テキストボックスにフォーカス状態変更コールバックを追加
+        self.edit_text.bind("<FocusIn>", self.on_text_focus_in)
+        self.edit_text.bind("<FocusOut>", self.on_text_focus_out)
+        
         # ボタンパネルの作成
         button_panel = ttk.Frame(edit_frame)
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
@@ -269,3 +344,31 @@ class OneClickFrame(ttk.Frame):
         except Exception as e:
             print(f"定型文の読み込みに失敗しました: {e}")
             return {}
+
+    def on_text_focus_in(self, event):
+        """
+        テキストボックスがフォーカスを得た時の処理。
+        
+        引数:
+          event: フォーカスイベント
+          
+        戻り値:
+          なし
+        """
+        # デバッグ用のコンソール出力（必要に応じて）
+        # print("テキスト入力モード：ボタン移動は無効")
+        pass
+
+    def on_text_focus_out(self, event):
+        """
+        テキストボックスがフォーカスを失った時の処理。
+        
+        引数:
+          event: フォーカスイベント
+          
+        戻り値:
+          なし
+        """
+        # デバッグ用のコンソール出力（必要に応じて）
+        # print("テキスト入力モード終了：ボタン移動有効")
+        pass
