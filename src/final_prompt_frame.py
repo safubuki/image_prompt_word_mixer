@@ -9,8 +9,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 import requests  # DeePL APIへのアクセスに利用
-
-from ui.template_manager import TemplateManager
+from src.template_manager import TemplateManager
 
 
 class FinalPromptFrame(ttk.LabelFrame):
