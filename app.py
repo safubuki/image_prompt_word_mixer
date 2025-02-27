@@ -237,11 +237,12 @@ class PromptGeneratorApp:
                 self.template_manager.element_prompt_file)
             self.basic_prompts = self.template_manager.get_basic_prompts()
             self.element_prompts = self.template_manager.get_element_prompts()
-            
-            # BasicPromptFrameの更新用メソッドを呼び出す
+
+            # BasicPromptFrameとElementPromptFrameの更新用メソッドを呼び出す
             self.basic_frame.update_basic_prompts(self.basic_prompts)
             self.basic_frame.set_basic_prompt(0)
-            
+            self.element_frame.update_element_prompts(self.element_prompts)
+
             # one_click_frame のエントリーも反映
             self.one_click_frame.refresh_entries()
             messagebox.showinfo("情報", "全ての編集結果が反映されました。")
@@ -260,41 +261,16 @@ class PromptGeneratorApp:
         """
         self.schedule_update()
 
-    def on_element_select(self, event):
+    def on_element_select(self, _):
         """
         追加プロンプト選択時の処理を行います。
         
         引数:
-          event: イベントオブジェクト
+          _ : イベント引数
           
         戻り値:
           なし
         """
-        selection = event.widget.selection()
-        selected_texts = []
-        seen_keys = set()
-        parent_ids = list(self.element_frame.tree.get_children(""))
-        for item in selection:
-            parent = self.element_frame.tree.parent(item)
-            if parent:
-                try:
-                    category_index = parent_ids.index(parent)
-                except ValueError:
-                    continue
-                category_data = self.element_prompts["categories"][category_index]
-                item_text = self.element_frame.tree.item(item, "text")
-                for prompt in category_data["prompt_lists"]:
-                    if prompt["title"] == item_text:
-                        key = (category_data["category"], prompt["title"], prompt["prompt"])
-                        if key not in seen_keys:
-                            seen_keys.add(key)
-                            selected_texts.append(prompt["prompt"])
-                        break
-        element_prompt_raw = "\n".join(selected_texts)
-        subject_val = self.element_frame.subject_entry.get().strip()
-        element_prompt_final = self.template_manager.replace_variables(
-            element_prompt_raw, {"character": subject_val})
-        self.element_prompt_content = element_prompt_final
         self.schedule_update()
 
     def on_text_change(self, _):
@@ -336,8 +312,14 @@ class PromptGeneratorApp:
         # BasicPromptFrameから現在の基本プロンプトテキストと変数値を取得
         basic_text, variables = self.basic_frame.get_current_prompt()
         final_prompt = self.template_manager.replace_variables(basic_text, variables)
-        element_text = getattr(self, 'element_prompt_content', '')
-        final_prompt += "\n" + element_text
+
+        # ElementPromptFrameから現在の追加プロンプト内容と主語を取得
+        element_prompt_raw, subject_val = self.element_frame.get_prompt_content()
+        if element_prompt_raw:
+            element_text = self.template_manager.replace_variables(element_prompt_raw,
+                                                                   {"character": subject_val})
+            final_prompt += "\n" + element_text
+
         self.final_frame.final_text.delete(1.0, tk.END)
         self.final_frame.final_text.insert(tk.END, final_prompt)
 
