@@ -5,17 +5,11 @@ one_click_frame.py
 各タブ内に従来の定型文コピー機能を配置します。
 ボタンをクリックすると該当エントリーのタイトルと定型文が編集領域に反映され、
 クリップボードへコピーされます。
-※ one_click.json は、各カテゴリごとにエントリーリストを保持する辞書形式で保存・読み出しします。
 """
-import json
-import os
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import ttk
 
-DEFAULT_ENTRY_COUNT = 20
-# DEFAULT_CATEGORIESは初期値としてのみ使用し、実際の表示はJSONに基づく
-DEFAULT_CATEGORIES = ["よく使う", "表情", "品質向上"]
-MAX_CATEGORIES = 7  # カテゴリタブの最大数
+from ui.one_click_manager import DEFAULT_ENTRY_COUNT, OneClickManager
 
 
 class OneClickFrame(ttk.Frame):
@@ -34,11 +28,9 @@ class OneClickFrame(ttk.Frame):
           なし
         """
         super().__init__(master, *args, **kwargs)
-        self.one_click_entries = self.load_one_click_entries()
+        self.manager = OneClickManager()  # ロジック部分の管理クラス
         # 各カテゴリごとのボタンウィジェットを格納する辞書
         self.button_widgets = {}
-        self.current_category = None
-        self.current_index = None
         self.create_widgets()
         # 上下左右キーでボタン位置移動のバインド
         self.bind_all("<Up>", lambda event: self.move_selected_button("up"))
@@ -77,8 +69,8 @@ class OneClickFrame(ttk.Frame):
         self.tab_notebook = ttk.Notebook(self)
         self.tab_notebook.pack(padx=10, pady=10, fill="both", expand=True)
 
-        # one_click.jsonから読み込んだカテゴリを使用
-        categories = list(self.one_click_entries.keys())
+        # 管理クラスからカテゴリ一覧を取得
+        categories = list(self.manager.one_click_entries.keys())
 
         for category in categories:
             frame = ttk.Frame(self.tab_notebook)
@@ -87,10 +79,7 @@ class OneClickFrame(ttk.Frame):
             # 2列グリッド用の設定
             frame.columnconfigure(0, weight=1)
             frame.columnconfigure(1, weight=1)
-            entries = self.one_click_entries.get(category, [{
-                "title": "",
-                "text": ""
-            } for _ in range(DEFAULT_ENTRY_COUNT)])
+            entries = self.manager.one_click_entries.get(category, [])
             for idx, entry in enumerate(entries):
                 row = idx // 2
                 col = idx % 2
@@ -128,140 +117,13 @@ class OneClickFrame(ttk.Frame):
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
         save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
         save_btn.pack(side="top", fill="x")
-        # ※リロードボタンはapp.py側に統合するため削除
         edit_frame.columnconfigure(1, weight=1)
-        # ※矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
+        # 矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
         hint_label = ttk.Label(edit_frame,
                                text="※矢印キーでボタン位置を移動できます",
                                font=("Arial", 8),
                                foreground="gray")
         hint_label.grid(row=2, column=1, sticky="e", padx=5, pady=(2, 0))
-
-    def load_one_click_entries(self):
-        """
-        one_click.jsonから各カテゴリごとのワンクリックエントリーを読み込みます。
-        読み込みデータがリストの場合は旧形式として先頭カテゴリに割り当て、
-        その他は空エントリーとします。
-        
-        引数:
-          なし
-        
-        戻り値:
-          dict: カテゴリごとにエントリーリストを格納した辞書
-        """
-        json_path = "one_click.json"
-        data = {}
-        if os.path.exists(json_path):
-            try:
-                with open(json_path, "r", encoding="utf-8") as f:
-                    json_data = json.load(f)
-                    if isinstance(json_data, dict):
-                        # 新形式の場合：カテゴリごとの辞書形式
-                        categories = list(json_data.keys())
-
-                        # カテゴリ数が上限を超える場合は警告
-                        if len(categories) > MAX_CATEGORIES:
-                            messagebox.showwarning(
-                                "警告",
-                                f"カテゴリタブは{MAX_CATEGORIES}つまでしか設定できません。先頭{MAX_CATEGORIES}個のみ読み込みます。")
-                            categories = categories[:MAX_CATEGORIES]
-
-                        # 有効なカテゴリのみ処理
-                        for cat in categories:
-                            entries = json_data.get(cat, [])
-                            for entry in entries:
-                                if "title" not in entry:
-                                    entry["title"] = ""
-                                if "text" not in entry:
-                                    entry["text"] = ""
-                            while len(entries) < DEFAULT_ENTRY_COUNT:
-                                entries.append({"title": "", "text": ""})
-                            data[cat] = entries[:DEFAULT_ENTRY_COUNT]
-
-                    elif isinstance(json_data, list):
-                        # 旧形式の場合：先頭カテゴリに割り当て、他は空エントリー
-                        entries = json_data
-                        while len(entries) < DEFAULT_ENTRY_COUNT:
-                            entries.append({"title": "", "text": ""})
-                        data[DEFAULT_CATEGORIES[0]] = entries[:DEFAULT_ENTRY_COUNT]
-                        for cat in DEFAULT_CATEGORIES[1:]:
-                            data[cat] = [{
-                                "title": "",
-                                "text": ""
-                            } for _ in range(DEFAULT_ENTRY_COUNT)]
-
-                    # 少なくとも1つのカテゴリがあることを保証
-                    if not data:
-                        for cat in DEFAULT_CATEGORIES:
-                            data[cat] = [{
-                                "title": "",
-                                "text": ""
-                            } for _ in range(DEFAULT_ENTRY_COUNT)]
-
-                    return data
-            except Exception as e:
-                print(f"one_click.json の読み込みに失敗しました: {e}")
-
-        # ファイルが存在しない場合、デフォルトカテゴリで初期化
-        for cat in DEFAULT_CATEGORIES:
-            data[cat] = [{"title": "", "text": ""} for _ in range(DEFAULT_ENTRY_COUNT)]
-        return data
-
-    def save_one_click_entries(self):
-        """
-        ワンクリックエントリーをone_click.jsonに保存します。
-        カテゴリ数が上限を超える場合は警告を表示します。
-        
-        引数:
-          なし
-        
-        戻り値:
-          なし
-        """
-        # カテゴリ数をチェック
-        if len(self.one_click_entries) > MAX_CATEGORIES:
-            messagebox.showwarning("警告", f"カテゴリタブは{MAX_CATEGORIES}つまでしか設定できません。")
-            # 最大数に制限
-            categories = list(self.one_click_entries.keys())[:MAX_CATEGORIES]
-            limited_entries = {}
-            for cat in categories:
-                limited_entries[cat] = self.one_click_entries[cat]
-            self.one_click_entries = limited_entries
-
-        json_path = "one_click.json"
-        try:
-            with open(json_path, "w", encoding="utf-8") as f:
-                json.dump(self.one_click_entries, f, ensure_ascii=False, indent=4)
-        except Exception as e:
-            print(f"one_click.json の保存に失敗しました: {e}")
-
-    def refresh_entries(self):
-        """
-        ワンクリックエントリーを再読み込みし、各カテゴリのボタン表示を更新します。
-        
-        引数:
-          なし
-        
-        戻り値:
-          なし
-        """
-        # 現在のタブをすべて削除
-        for tab in self.tab_notebook.tabs():
-            self.tab_notebook.forget(tab)
-
-        # ボタンウィジェット辞書をクリア
-        self.button_widgets.clear()
-
-        # エントリーを再読み込み
-        self.one_click_entries = self.load_one_click_entries()
-
-        # タブを再作成
-        self.create_tab_notebook()
-
-        # 現在選択中のカテゴリが残っているか確認
-        if self.current_category not in self.one_click_entries:
-            self.current_category = None
-            self.current_index = None
 
     def create_button_command(self, category, index):
         """
@@ -301,9 +163,7 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
-        self.current_category = category
-        self.current_index = index
-        entry = self.one_click_entries[category][index]
+        entry = self.manager.get_entry(category, index)
         text_to_copy = entry["text"]
         title_to_copy = entry["title"]
         self.clipboard_clear()
@@ -323,20 +183,23 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
-        if self.current_category is not None and self.current_index is not None:
+        if self.manager.current_category is not None and self.manager.current_index is not None:
             new_title = self.title_edit.get("1.0", tk.END).strip()
             new_text = self.edit_text.get("1.0", tk.END).strip()
-            self.one_click_entries[self.current_category][self.current_index]["title"] = new_title
-            self.one_click_entries[self.current_category][self.current_index]["text"] = new_text
-            self.save_one_click_entries()
-            self.one_click_entries = self.load_one_click_entries()
-            self.button_widgets[self.current_category][self.current_index].config(text=new_title)
+
+            category = self.manager.current_category
+            index = self.manager.current_index
+
+            # 管理クラスを通じてエントリーを更新
+            self.manager.update_entry(category, index, new_title, new_text)
+
+            # ボタンの表示を更新
+            if category in self.button_widgets and index < len(self.button_widgets[category]):
+                self.button_widgets[category][index].config(text=new_title)
 
     def move_selected_button(self, direction):
         """
         上下左右キー押下時に、選択中のボタン位置を移動します。
-        移動先が有効な場合、one_click_entries の該当エントリーの位置を入れ替え、
-        ボタン表示および json 保存データの順序も更新します。
         
         引数:
           direction (str): "up"、"down"、"left"、"right"
@@ -344,45 +207,44 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
-        if self.current_category is None or self.current_index is None:
+        if self.manager.current_category is None or self.manager.current_index is None:
             return
 
-        target_index = self.get_target_index(self.current_index, direction)
+        category = self.manager.current_category
+        current_index = self.manager.current_index
+
+        # 管理クラスを通じて移動先インデックスを取得
+        target_index = self.manager.get_target_index(current_index, direction)
         if target_index is None:
             return
 
-        # one_click_entries 内のエントリーを入れ替え
-        entries = self.one_click_entries[self.current_category]
-        entries[self.current_index], entries[target_index] = entries[target_index], entries[
-            self.current_index]
-        # ボタンウィジェットの表示内容を更新
-        buttons = self.button_widgets[self.current_category]
-        buttons[self.current_index].config(text=entries[self.current_index]["title"])
-        buttons[target_index].config(text=entries[target_index]["title"])
+        # エントリーを入れ替える
+        if self.manager.swap_entries(category, current_index, target_index):
+            # ボタンの表示内容を更新
+            entries = self.manager.one_click_entries[category]
+            self.button_widgets[category][current_index].config(
+                text=entries[current_index]["title"])
+            self.button_widgets[category][target_index].config(text=entries[target_index]["title"])
 
-        # 選択中のインデックスを更新し、変更内容を保存
-        self.current_index = target_index
-        self.save_one_click_entries()
-
-    def get_target_index(self, current, direction):
+    def refresh_entries(self):
         """
-        現在のインデックスから指定された方向への移動先インデックスを計算します。（2列グリッドを前提）
+        ワンクリックエントリーを再読み込みし、各カテゴリのボタン表示を更新します。
         
         引数:
-          current (int): 現在のインデックス
-          direction (str): "up"、"down"、"left"、"right"
+          なし
         
         戻り値:
-          int または None: 新しいインデックス。移動できない場合は None を返す
+          なし
         """
-        if direction == "up":
-            new_index = current - 2 if current >= 2 else None
-        elif direction == "down":
-            new_index = current + 2 if current + 2 < DEFAULT_ENTRY_COUNT else None
-        elif direction == "left":
-            new_index = current - 1 if current % 2 == 1 else None
-        elif direction == "right":
-            new_index = current + 1 if current % 2 == 0 and current + 1 < DEFAULT_ENTRY_COUNT else None
-        else:
-            new_index = None
-        return new_index
+        # 現在のタブをすべて削除
+        for tab in self.tab_notebook.tabs():
+            self.tab_notebook.forget(tab)
+
+        # ボタンウィジェット辞書をクリア
+        self.button_widgets.clear()
+
+        # エントリーを再読み込み
+        self.manager = OneClickManager()
+
+        # タブを再作成
+        self.create_tab_notebook()
