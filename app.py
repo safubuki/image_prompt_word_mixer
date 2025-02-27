@@ -5,10 +5,10 @@ Gemini Prompt Generatorアプリケーションの起動およびUI統合機能�
 import os
 import tkinter as tk
 
-from src.app_menu import AppMenu
-from src.app_settings import AppSettings
-from src.app_ui_manager import AppUIManager
-from src.template_manager import TemplateManager  # インポートパスを更新
+from src.core.template_manager import TemplateManager  # インポートパスを更新
+from src.ui.app_menu import AppMenu
+from src.ui.app_settings import AppSettings
+from src.ui.app_ui_manager import AppUIManager
 
 
 class PromptGeneratorApp:
@@ -45,15 +45,18 @@ class PromptGeneratorApp:
         if not os.path.exists(config_dir):
             os.makedirs(config_dir)
 
+        # 設定ファイルパスの修正
+        settings_dir = os.path.join(os.getcwd(), "settings")
+        basic_prompts_path = os.path.join(settings_dir, "basic_prompts.json")
+        element_prompts_path = os.path.join(settings_dir, "element_prompts.json")
+        api_key_path = os.path.join(settings_dir, "api_key.json")
+
         # テンプレートマネージャー初期化
         # プロンプト用JSONファイルを読み込み、データを管理するマネージャーを作成
-        basic_prompts_path = os.path.join(config_dir, "basic_prompts.json")
-        element_prompts_path = os.path.join(config_dir, "element_prompts.json")
         self.template_manager = TemplateManager(basic_prompts_path, element_prompts_path)
 
         # 設定クラス初期化
         # APIキーなどのアプリケーション設定を管理するクラスを初期化
-        api_key_path = os.path.join(config_dir, "api_key.json")
         self.app_settings = AppSettings(self.master, api_key_path)
 
         # UIマネージャー初期化

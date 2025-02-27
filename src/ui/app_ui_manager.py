@@ -6,10 +6,11 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
-from src.basic_prompt_frame import BasicPromptFrame
-from src.element_prompt_frame import ElementPromptFrame
-from src.final_prompt_frame import FinalPromptFrame
-from src.one_click_frame import OneClickFrame
+# 相対インポートに修正
+from src.ui.frames.basic_prompt_frame import BasicPromptFrame
+from src.ui.frames.element_prompt_frame import ElementPromptFrame
+from src.ui.frames.final_prompt_frame import FinalPromptFrame
+from src.ui.frames.one_click_frame import OneClickFrame
 
 
 class AppUIManager:

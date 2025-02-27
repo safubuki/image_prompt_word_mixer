@@ -3,12 +3,13 @@ template_manager.py
 プロンプトデータの読み込み、保存、更新および変数の置換機能を提供するコンポーネントです。
 """
 import json
+import os
 import sys
 import tkinter as tk
 from tkinter import messagebox
 
 # 定数（出力メッセージなど）の定義
-FILE_NOT_FOUND_MSG = "jsonファイルをexeファイルと同じフォルダに用意してください。"
+FILE_NOT_FOUND_MSG = "jsonファイルをsettingsフォルダに用意してください。"
 
 
 class TemplateManager:
@@ -50,10 +51,26 @@ class TemplateManager:
           list: 読み込んだプロンプトデータのリスト
         """
         try:
-            with open(filename, "r", encoding="utf-8") as file:
-                return json.load(file)
+            # 直接指定されたパスで試行
+            if os.path.exists(filename):
+                with open(filename, "r", encoding="utf-8") as file:
+                    return json.load(file)
+
+            # 現在の作業ディレクトリの下のsettingsフォルダを確認
+            settings_dir = os.path.join(os.getcwd(), "settings")
+            settings_path = os.path.join(settings_dir, os.path.basename(filename))
+            if os.path.exists(settings_path):
+                with open(settings_path, "r", encoding="utf-8") as file:
+                    return json.load(file)
+
+            self._handle_file_not_found()
         except FileNotFoundError:
             self._handle_file_not_found()
+        except Exception as e:
+            root = tk.Tk()
+            root.withdraw()
+            messagebox.showerror("Error", f"ファイル読み込みエラー: {str(e)}")
+            sys.exit()
 
     def _handle_file_not_found(self):
         """

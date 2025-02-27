@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.element_prompt_frame import ElementPromptFrame
+from ui.frames.element_prompt_frame import ElementPromptFrame
 
 
 @pytest.fixture

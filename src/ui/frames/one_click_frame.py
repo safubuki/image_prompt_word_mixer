@@ -11,7 +11,7 @@ import os
 import tkinter as tk
 from tkinter import ttk
 
-from core.one_click_manager import DEFAULT_ENTRY_COUNT, OneClickManager
+from src.core.one_click_manager import DEFAULT_ENTRY_COUNT, OneClickManager
 
 
 class OneClickFrame(ttk.Frame):
