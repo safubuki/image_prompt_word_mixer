@@ -313,18 +313,24 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
-        # 現在のタブをすべて削除
-        for tab in self.tab_notebook.tabs():
-            self.tab_notebook.forget(tab)
-
+        # すべてのウィジェットを破棄
+        for widget in self.winfo_children():
+            widget.destroy()
+        
         # ボタンウィジェット辞書をクリア
         self.button_widgets.clear()
-
+        
         # エントリーを再読み込み
         self.manager = OneClickManager()
-
-        # タブを再作成
-        self.create_tab_notebook()
+        
+        # UIを再構築
+        self.create_widgets()
+        
+        # キーバインドを再設定
+        self.bind_all("<Up>", self.handle_up_key)
+        self.bind_all("<Down>", self.handle_down_key)
+        self.bind_all("<Left>", self.handle_left_key)
+        self.bind_all("<Right>", self.handle_right_key)
 
     def load_entries(self):
         """
