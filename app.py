@@ -44,7 +44,7 @@ class PromptGeneratorApp:
         self.create_notebook()
         self.load_prompts()
         self.create_ui_components()
-        self.set_default_prompt()
+        self.basic_frame.set_basic_prompt(0)
 
     def set_icon(self):
         """
@@ -237,27 +237,16 @@ class PromptGeneratorApp:
                 self.template_manager.element_prompt_file)
             self.basic_prompts = self.template_manager.get_basic_prompts()
             self.element_prompts = self.template_manager.get_element_prompts()
-            self.basic_frame.basic_combobox['values'] = [p["name"] for p in self.basic_prompts]
-            self.basic_frame.basic_combobox.current(0)
-            self.on_basic_select(None)
+            
+            # BasicPromptFrameの更新用メソッドを呼び出す
+            self.basic_frame.update_basic_prompts(self.basic_prompts)
+            self.basic_frame.set_basic_prompt(0)
+            
             # one_click_frame のエントリーも反映
             self.one_click_frame.refresh_entries()
             messagebox.showinfo("情報", "全ての編集結果が反映されました。")
         except Exception as e:
             messagebox.showerror("エラー", f"編集結果の反映に失敗しました: {e}")
-
-    def set_default_prompt(self):
-        """
-        初期プロンプトを設定します。
-        
-        引数:
-          なし
-          
-        戻り値:
-          なし
-        """
-        self.basic_frame.basic_combobox.current(0)
-        self.on_basic_select(None)
 
     def on_basic_select(self, _):
         """
@@ -269,13 +258,7 @@ class PromptGeneratorApp:
         戻り値:
           なし
         """
-        selection = self.basic_frame.basic_combobox.current()
-        if selection >= 0:
-            prompt_obj = self.basic_prompts[selection]
-            self.basic_frame.basic_text.delete(1.0, tk.END)
-            self.basic_frame.basic_text.insert(tk.END, prompt_obj["prompt"])
-            self.basic_frame.update_variable_entries(prompt_obj["default_variables"])
-            self.schedule_update()
+        self.schedule_update()
 
     def on_element_select(self, event):
         """
@@ -350,8 +333,8 @@ class PromptGeneratorApp:
         戻り値:
           なし
         """
-        basic_text = self.basic_frame.basic_text.get(1.0, tk.END).strip()
-        variables = {var: entry.get() for var, entry in self.basic_frame.variable_entries.items()}
+        # BasicPromptFrameから現在の基本プロンプトテキストと変数値を取得
+        basic_text, variables = self.basic_frame.get_current_prompt()
         final_prompt = self.template_manager.replace_variables(basic_text, variables)
         element_text = getattr(self, 'element_prompt_content', '')
         final_prompt += "\n" + element_text
