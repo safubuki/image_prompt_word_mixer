@@ -39,7 +39,10 @@ class OneClickManager:
         戻り値:
           dict: カテゴリごとにエントリーリストを格納した辞書
         """
-        json_path = "one_click.json"
+        # configフォルダのパスを取得
+        config_dir = os.path.join(os.getcwd(), "config")
+        json_path = os.path.join(config_dir, "one_click.json")
+
         data = {}
         if os.path.exists(json_path):
             try:
@@ -118,7 +121,10 @@ class OneClickManager:
                 limited_entries[cat] = self.one_click_entries[cat]
             self.one_click_entries = limited_entries
 
-        json_path = "one_click.json"
+        # configフォルダのパスを取得し、そこにJSONを保存
+        config_dir = os.path.join(os.getcwd(), "config")
+        json_path = os.path.join(config_dir, "one_click.json")
+
         try:
             with open(json_path, "w", encoding="utf-8") as f:
                 json.dump(self.one_click_entries, f, ensure_ascii=False, indent=4)

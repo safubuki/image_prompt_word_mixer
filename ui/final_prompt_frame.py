@@ -156,7 +156,8 @@ class FinalPromptFrame(ttk.LabelFrame):
         戻り値:
           str または None
         """
-        api_key_path = "api_key.json"
+        config_dir = os.path.join(os.getcwd(), "config")
+        api_key_path = os.path.join(config_dir, "api_key.json")
         if os.path.exists(api_key_path):
             try:
                 with open(api_key_path, "r", encoding="utf-8") as f:

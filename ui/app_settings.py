@@ -13,16 +13,19 @@ class AppSettings:
     
     引数:
       master (tk.Widget): メインウィンドウ
+      api_key_path (str): APIキーファイルのパス
     """
 
-    def __init__(self, master):
+    def __init__(self, master, api_key_path):
         """
         コンストラクタ
         
         引数:
           master (tk.Widget): メインウィンドウ
+          api_key_path (str): APIキーファイルのパス
         """
         self.master = master
+        self.api_key_path = api_key_path
         self.deepl_api_key = ""
         self.load_api_key()
 
@@ -37,7 +40,7 @@ class AppSettings:
           なし
         """
         try:
-            with open("api_key.json", "r", encoding="utf-8") as f:
+            with open(self.api_key_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             self.deepl_api_key = data.get("api_key", "")
         except Exception:
@@ -60,7 +63,7 @@ class AppSettings:
         entry = tk.Entry(dialog, width=50)
         entry.pack(padx=10, pady=5)
         try:
-            with open("api_key.json", "r", encoding="utf-8") as f:
+            with open(self.api_key_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             current_key = data.get("api_key", "")
         except Exception:
@@ -72,7 +75,7 @@ class AppSettings:
         def save_api_key():
             new_key = entry.get()
             try:
-                with open("api_key.json", "w", encoding="utf-8") as f:
+                with open(self.api_key_path, "w", encoding="utf-8") as f:
                     json.dump({"api_key": new_key}, f, ensure_ascii=False, indent=4)
                 self.reload_api_key()
                 dialog.destroy()
@@ -93,7 +96,7 @@ class AppSettings:
           なし
         """
         try:
-            with open("api_key.json", "r", encoding="utf-8") as f:
+            with open(self.api_key_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             self.deepl_api_key = data.get("api_key", "")
             print("APIキーを設定しました。")

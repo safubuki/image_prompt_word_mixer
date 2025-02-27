@@ -2,6 +2,7 @@
 app_menu.py
 アプリケーションのメニューバーを管理するクラスです。
 """
+import os
 import subprocess
 import tkinter as tk
 from tkinter import messagebox
@@ -16,9 +17,10 @@ class AppMenu:
       template_manager (TemplateManager): テンプレートマネージャー
       ui_manager (AppUIManager): UIマネージャー
       api_key_callback (callable): APIキー設定時のコールバック関数
+      config_dir (str): 設定ファイルディレクトリ
     """
 
-    def __init__(self, master, template_manager, ui_manager, api_key_callback):
+    def __init__(self, master, template_manager, ui_manager, api_key_callback, config_dir):
         """
         コンストラクタ
         
@@ -27,11 +29,13 @@ class AppMenu:
           template_manager (TemplateManager): テンプレートマネージャー
           ui_manager (AppUIManager): UIマネージャー
           api_key_callback (callable): APIキー設定時のコールバック関数
+          config_dir (str): 設定ファイルディレクトリ
         """
         self.master = master
         self.template_manager = template_manager
         self.ui_manager = ui_manager
         self.api_key_callback = api_key_callback
+        self.config_dir = config_dir
         self.create_menu()
 
     def create_menu(self):
@@ -46,12 +50,17 @@ class AppMenu:
         """
         menubar = tk.Menu(self.master)
         file_menu = tk.Menu(menubar, tearoff=0)
+
+        # ファイルパスを設定ディレクトリ内に指定
+        basic_prompts_path = os.path.join(self.config_dir, "basic_prompts.json")
+        element_prompts_path = os.path.join(self.config_dir, "element_prompts.json")
+        one_click_path = os.path.join(self.config_dir, "one_click.json")
+
         file_menu.add_command(label="基本プロンプト編集",
-                              command=lambda: self.open_json_editor("basic_prompts.json"))
+                              command=lambda: self.open_json_editor(basic_prompts_path))
         file_menu.add_command(label="追加プロンプト編集",
-                              command=lambda: self.open_json_editor("element_prompts.json"))
-        file_menu.add_command(label="定型文編集",
-                              command=lambda: self.open_json_editor("one_click.json"))
+                              command=lambda: self.open_json_editor(element_prompts_path))
+        file_menu.add_command(label="定型文編集", command=lambda: self.open_json_editor(one_click_path))
         # 定型文ファイルの後、区切り線を追加
         file_menu.add_separator()
         # 編集結果反映機能を統合して全設定ファイルを反映

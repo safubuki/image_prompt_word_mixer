@@ -6,6 +6,8 @@ one_click_frame.py
 ボタンをクリックすると該当エントリーのタイトルと定型文が編集領域に反映され、
 クリップボードへコピーされます。
 """
+import json
+import os
 import tkinter as tk
 from tkinter import ttk
 
@@ -248,3 +250,22 @@ class OneClickFrame(ttk.Frame):
 
         # タブを再作成
         self.create_tab_notebook()
+
+    def load_entries(self):
+        """
+        JSONファイルから定型文エントリーをロードします。
+        
+        引数:
+          なし
+          
+        戻り値:
+          dict: ロードされたエントリー
+        """
+        try:
+            config_dir = os.path.join(os.getcwd(), "config")
+            json_path = os.path.join(config_dir, "one_click.json")
+            with open(json_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"定型文の読み込みに失敗しました: {e}")
+            return {}
