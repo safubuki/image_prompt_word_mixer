@@ -10,10 +10,12 @@ one_click_frame.py
 import json
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 DEFAULT_ENTRY_COUNT = 20
+# DEFAULT_CATEGORIESは初期値としてのみ使用し、実際の表示はJSONに基づく
 DEFAULT_CATEGORIES = ["よく使う", "表情", "品質向上"]
+MAX_CATEGORIES = 7  # カテゴリタブの最大数
 
 
 class OneClickFrame(ttk.Frame):
@@ -75,7 +77,10 @@ class OneClickFrame(ttk.Frame):
         self.tab_notebook = ttk.Notebook(self)
         self.tab_notebook.pack(padx=10, pady=10, fill="both", expand=True)
 
-        for category in DEFAULT_CATEGORIES:
+        # one_click.jsonから読み込んだカテゴリを使用
+        categories = list(self.one_click_entries.keys())
+
+        for category in categories:
             frame = ttk.Frame(self.tab_notebook)
             self.tab_notebook.add(frame, text=category)
             self.button_widgets[category] = []
@@ -152,7 +157,17 @@ class OneClickFrame(ttk.Frame):
                     json_data = json.load(f)
                     if isinstance(json_data, dict):
                         # 新形式の場合：カテゴリごとの辞書形式
-                        for cat in DEFAULT_CATEGORIES:
+                        categories = list(json_data.keys())
+
+                        # カテゴリ数が上限を超える場合は警告
+                        if len(categories) > MAX_CATEGORIES:
+                            messagebox.showwarning(
+                                "警告",
+                                f"カテゴリタブは{MAX_CATEGORIES}つまでしか設定できません。先頭{MAX_CATEGORIES}個のみ読み込みます。")
+                            categories = categories[:MAX_CATEGORIES]
+
+                        # 有効なカテゴリのみ処理
+                        for cat in categories:
                             entries = json_data.get(cat, [])
                             for entry in entries:
                                 if "title" not in entry:
@@ -162,6 +177,7 @@ class OneClickFrame(ttk.Frame):
                             while len(entries) < DEFAULT_ENTRY_COUNT:
                                 entries.append({"title": "", "text": ""})
                             data[cat] = entries[:DEFAULT_ENTRY_COUNT]
+
                     elif isinstance(json_data, list):
                         # 旧形式の場合：先頭カテゴリに割り当て、他は空エントリー
                         entries = json_data
@@ -173,10 +189,20 @@ class OneClickFrame(ttk.Frame):
                                 "title": "",
                                 "text": ""
                             } for _ in range(DEFAULT_ENTRY_COUNT)]
+
+                    # 少なくとも1つのカテゴリがあることを保証
+                    if not data:
+                        for cat in DEFAULT_CATEGORIES:
+                            data[cat] = [{
+                                "title": "",
+                                "text": ""
+                            } for _ in range(DEFAULT_ENTRY_COUNT)]
+
                     return data
             except Exception as e:
                 print(f"one_click.json の読み込みに失敗しました: {e}")
-        # ファイルが存在しない場合
+
+        # ファイルが存在しない場合、デフォルトカテゴリで初期化
         for cat in DEFAULT_CATEGORIES:
             data[cat] = [{"title": "", "text": ""} for _ in range(DEFAULT_ENTRY_COUNT)]
         return data
@@ -184,6 +210,7 @@ class OneClickFrame(ttk.Frame):
     def save_one_click_entries(self):
         """
         ワンクリックエントリーをone_click.jsonに保存します。
+        カテゴリ数が上限を超える場合は警告を表示します。
         
         引数:
           なし
@@ -191,6 +218,16 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
+        # カテゴリ数をチェック
+        if len(self.one_click_entries) > MAX_CATEGORIES:
+            messagebox.showwarning("警告", f"カテゴリタブは{MAX_CATEGORIES}つまでしか設定できません。")
+            # 最大数に制限
+            categories = list(self.one_click_entries.keys())[:MAX_CATEGORIES]
+            limited_entries = {}
+            for cat in categories:
+                limited_entries[cat] = self.one_click_entries[cat]
+            self.one_click_entries = limited_entries
+
         json_path = "one_click.json"
         try:
             with open(json_path, "w", encoding="utf-8") as f:
@@ -208,13 +245,23 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
+        # 現在のタブをすべて削除
+        for tab in self.tab_notebook.tabs():
+            self.tab_notebook.forget(tab)
+
+        # ボタンウィジェット辞書をクリア
+        self.button_widgets.clear()
+
+        # エントリーを再読み込み
         self.one_click_entries = self.load_one_click_entries()
-        for category in DEFAULT_CATEGORIES:
-            entries = self.one_click_entries.get(category, [])
-            buttons = self.button_widgets.get(category, [])
-            for idx, entry in enumerate(entries):
-                if idx < len(buttons):
-                    buttons[idx].config(text=entry["title"])
+
+        # タブを再作成
+        self.create_tab_notebook()
+
+        # 現在選択中のカテゴリが残っているか確認
+        if self.current_category not in self.one_click_entries:
+            self.current_category = None
+            self.current_index = None
 
     def create_button_command(self, category, index):
         """
