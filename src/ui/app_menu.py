@@ -17,10 +17,10 @@ class AppMenu:
       template_manager (TemplateManager): テンプレートマネージャー
       ui_manager (AppUIManager): UIマネージャー
       api_key_callback (callable): APIキー設定時のコールバック関数
-      config_dir (str): 設定ファイルディレクトリ
+      settings_dir (str): 設定ファイルディレクトリ
     """
 
-    def __init__(self, master, template_manager, ui_manager, api_key_callback, config_dir):
+    def __init__(self, master, template_manager, ui_manager, api_key_callback, settings_dir):
         """
         コンストラクタ
         
@@ -29,13 +29,13 @@ class AppMenu:
           template_manager (TemplateManager): テンプレートマネージャー
           ui_manager (AppUIManager): UIマネージャー
           api_key_callback (callable): APIキー設定時のコールバック関数
-          config_dir (str): 設定ファイルディレクトリ
+          settings_dir (str): 設定ファイルディレクトリ
         """
         self.master = master
         self.template_manager = template_manager
         self.ui_manager = ui_manager
         self.api_key_callback = api_key_callback
-        self.config_dir = config_dir
+        self.settings_dir = settings_dir
         self.create_menu()
 
     def create_menu(self):
@@ -52,9 +52,9 @@ class AppMenu:
         file_menu = tk.Menu(menubar, tearoff=0)
 
         # ファイルパスを設定ディレクトリ内に指定
-        basic_prompts_path = os.path.join(self.config_dir, "basic_prompts.json")
-        element_prompts_path = os.path.join(self.config_dir, "element_prompts.json")
-        one_click_path = os.path.join(self.config_dir, "one_click.json")
+        basic_prompts_path = os.path.join(self.settings_dir, "basic_prompts.json")
+        element_prompts_path = os.path.join(self.settings_dir, "element_prompts.json")
+        one_click_path = os.path.join(self.settings_dir, "one_click.json")
 
         file_menu.add_command(label="基本プロンプト編集",
                               command=lambda: self.open_json_editor(basic_prompts_path))

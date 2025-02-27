@@ -38,18 +38,18 @@ class PromptGeneratorApp:
         # ウィンドウサイズの固定（リサイズ不可）
         self.master.resizable(False, False)
 
-        # configフォルダのパスを作成
-        config_dir = os.path.join(os.getcwd(), "config")
-
-        # configフォルダが存在しない場合は作成
-        if not os.path.exists(config_dir):
-            os.makedirs(config_dir)
-
-        # 設定ファイルパスの修正
+        # settingsフォルダのパスを作成
         settings_dir = os.path.join(os.getcwd(), "settings")
+
+        # settingsフォルダが存在しない場合は作成
+        if not os.path.exists(settings_dir):
+            os.makedirs(settings_dir)
+
+        # 設定ファイルパス
         basic_prompts_path = os.path.join(settings_dir, "basic_prompts.json")
         element_prompts_path = os.path.join(settings_dir, "element_prompts.json")
         api_key_path = os.path.join(settings_dir, "api_key.json")
+        one_click_path = os.path.join(settings_dir, "one_click.json")
 
         # テンプレートマネージャー初期化
         # プロンプト用JSONファイルを読み込み、データを管理するマネージャーを作成
@@ -68,9 +68,8 @@ class PromptGeneratorApp:
         # メニュークラス初期化
         # アプリケーションのメニューバーを生成・管理するクラスを初期化
         # 各コンポーネントを連携させるために必要なオブジェクトを渡す
-        one_click_path = os.path.join(config_dir, "one_click.json")
         self.app_menu = AppMenu(self.master, self.template_manager, self.ui_manager,
-                                self.app_settings.open_api_key_dialog, config_dir)
+                                self.app_settings.open_api_key_dialog, settings_dir)
 
 
 if __name__ == "__main__":
