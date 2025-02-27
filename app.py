@@ -142,6 +142,9 @@ class PromptGeneratorApp:
         self.prompt_tab.columnconfigure(1, weight=1)
         self.final_frame = FinalPromptFrame(self.prompt_tab)
         self.final_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky="nsew")
+        # FinalPromptFrameに入力ソースを設定
+        self.final_frame.set_input_sources(self.basic_frame, self.element_frame,
+                                           self.template_manager)
         self.prompt_tab.rowconfigure(1, weight=1)
         self.variable_entries = self.basic_frame.variable_entries
         self.one_click_frame = OneClickFrame(self.one_click_tab)
@@ -259,7 +262,7 @@ class PromptGeneratorApp:
         戻り値:
           なし
         """
-        self.schedule_update()
+        self.final_frame.schedule_update()
 
     def on_element_select(self, _):
         """
@@ -271,7 +274,7 @@ class PromptGeneratorApp:
         戻り値:
           なし
         """
-        self.schedule_update()
+        self.final_frame.schedule_update()
 
     def on_text_change(self, _):
         """
@@ -283,45 +286,7 @@ class PromptGeneratorApp:
         戻り値:
           なし
         """
-        self.schedule_update()
-
-    def schedule_update(self):
-        """
-        最終プロンプト生成を一定遅延後にスケジュールします。
-        
-        引数:
-          なし
-          
-        戻り値:
-          なし
-        """
-        if self.update_timer:
-            self.master.after_cancel(self.update_timer)
-        self.update_timer = self.master.after(1000, self.generate_final_prompt)
-
-    def generate_final_prompt(self):
-        """
-        基本プロンプトと追加プロンプトを結合し、最終プロンプトを生成します。
-        
-        引数:
-          なし
-          
-        戻り値:
-          なし
-        """
-        # BasicPromptFrameから現在の基本プロンプトテキストと変数値を取得
-        basic_text, variables = self.basic_frame.get_current_prompt()
-        final_prompt = self.template_manager.replace_variables(basic_text, variables)
-
-        # ElementPromptFrameから現在の追加プロンプト内容と主語を取得
-        element_prompt_raw, subject_val = self.element_frame.get_prompt_content()
-        if element_prompt_raw:
-            element_text = self.template_manager.replace_variables(element_prompt_raw,
-                                                                   {"character": subject_val})
-            final_prompt += "\n" + element_text
-
-        self.final_frame.final_text.delete(1.0, tk.END)
-        self.final_frame.final_text.insert(tk.END, final_prompt)
+        self.final_frame.schedule_update()
 
 
 if __name__ == "__main__":

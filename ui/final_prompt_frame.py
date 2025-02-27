@@ -17,24 +17,30 @@ class FinalPromptFrame(ttk.LabelFrame):
     
     引数:
       master (tk.Widget): 親ウィジェット
+      template_manager (object): テンプレート管理オブジェクト
       *args, **kwargs: その他
       
     戻り値:
       なし
     """
 
-    def __init__(self, master, *args, **kwargs):
+    def __init__(self, master, template_manager=None, *args, **kwargs):
         """
         コンストラクタ
         
         引数:
           master (tk.Widget): 親ウィジェット
+          template_manager (object): テンプレート管理オブジェクト
           *args, **kwargs: その他
           
         戻り値:
           なし
         """
         super().__init__(master, text="完成プロンプト（基本＋追加）", *args, **kwargs)
+        self.template_manager = template_manager
+        self.update_timer = None
+        self.basic_frame = None
+        self.element_frame = None
         self.create_widgets()
 
     def create_widgets(self):
@@ -198,3 +204,75 @@ class FinalPromptFrame(ttk.LabelFrame):
                 messagebox.showerror("エラー", "翻訳結果が取得できませんでした。")
         except requests.exceptions.RequestException as e:
             messagebox.showerror("エラー", f"翻訳リクエストに失敗しました: {e}")
+
+    def set_input_sources(self, basic_frame, element_frame, template_manager):
+        """
+        入力ソースとなるフレームとテンプレートマネージャーを設定します。
+        
+        引数:
+          basic_frame (BasicPromptFrame): 基本プロンプトフレーム
+          element_frame (ElementPromptFrame): 追加プロンプトフレーム
+          template_manager (object): テンプレート管理オブジェクト
+          
+        戻り値:
+          なし
+        """
+        self.basic_frame = basic_frame
+        self.element_frame = element_frame
+        self.template_manager = template_manager
+
+    def schedule_update(self):
+        """
+        最終プロンプト生成を一定遅延後にスケジュールします。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
+        if self.update_timer:
+            self.master.after_cancel(self.update_timer)
+        self.update_timer = self.master.after(1000, self.generate_final_prompt)
+
+    def generate_final_prompt(self):
+        """
+        基本プロンプトと追加プロンプトを結合し、最終プロンプトを生成します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
+        if not self.basic_frame or not self.element_frame or not self.template_manager:
+            return
+
+        # BasicPromptFrameから現在の基本プロンプトテキストと変数値を取得
+        basic_text, variables = self.basic_frame.get_current_prompt()
+        final_prompt = self.template_manager.replace_variables(basic_text, variables)
+
+        # ElementPromptFrameから現在の追加プロンプト内容と主語を取得
+        element_prompt_raw, subject_val = self.element_frame.get_prompt_content()
+        if element_prompt_raw:
+            element_text = self.template_manager.replace_variables(element_prompt_raw,
+                                                                   {"character": subject_val})
+            final_prompt += "\n" + element_text
+
+        self.final_text.delete(1.0, tk.END)
+        self.final_text.insert(tk.END, final_prompt)
+
+    def clear(self):
+        """
+        テキストエリアをクリアします。
+        
+        引数:
+          なし
+          
+        戻り値:
+          なし
+        """
+        self.final_text.delete(1.0, tk.END)
+        self.english_text.config(state="normal")
+        self.english_text.delete(1.0, tk.END)
+        self.english_text.config(state="disabled")
