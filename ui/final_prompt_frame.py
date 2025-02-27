@@ -10,6 +10,8 @@ from tkinter import messagebox, ttk
 
 import requests  # DeePL APIへのアクセスに利用
 
+from ui.template_manager import TemplateManager
+
 
 class FinalPromptFrame(ttk.LabelFrame):
     """
@@ -197,7 +199,6 @@ class FinalPromptFrame(ttk.LabelFrame):
             if translations:
                 en_text = translations[0].get("text", "")
                 self.english_text.config(state="normal")
-                self.english_text.delete(1.0, tk.END)
                 self.english_text.insert(tk.END, en_text)
                 self.english_text.config(state="disabled")
             else:

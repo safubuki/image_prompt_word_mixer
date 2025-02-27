@@ -5,10 +5,10 @@ Gemini Prompt Generatorアプリケーションの起動およびUI統合機能�
 import os
 import tkinter as tk
 
-from template_manager import TemplateManager
 from ui.app_menu import AppMenu
 from ui.app_settings import AppSettings
 from ui.app_ui_manager import AppUIManager
+from ui.template_manager import TemplateManager  # インポートパスを更新
 
 
 class PromptGeneratorApp:

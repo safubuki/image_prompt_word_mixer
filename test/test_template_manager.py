@@ -1,8 +1,10 @@
-import sys
 import os
+import sys
+
 import pytest
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from template_manager import TemplateManager
+from ui.template_manager import TemplateManager
 
 
 def test_load_prompts():
@@ -32,8 +34,10 @@ def test_file_not_found(monkeypatch):
     ファイルが見つからない場合のload_promptsメソッドのテスト。
     エラーメッセージが表示され、システムが終了することを確認します。
     """
+
     def mock_showerror(title, message):
         pass
+
     monkeypatch.setattr("tkinter.messagebox.showerror", mock_showerror)
     with pytest.raises(SystemExit):
         manager = TemplateManager("non_existent_file.json", "element_prompts.json")
