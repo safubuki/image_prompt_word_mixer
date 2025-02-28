@@ -200,6 +200,7 @@ class FinalPromptFrame(ttk.LabelFrame):
             if translations:
                 en_text = translations[0].get("text", "")
                 self.english_text.config(state="normal")
+                self.english_text.delete(1.0, tk.END)  # 既存のテキストをクリア
                 self.english_text.insert(tk.END, en_text)
                 self.english_text.config(state="disabled")
             else:
