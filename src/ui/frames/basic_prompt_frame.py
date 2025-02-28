@@ -38,8 +38,8 @@ class BasicPromptFrame(ttk.LabelFrame):
         """
         super().__init__(master, text="基本プロンプト", *args, **kwargs)
         self.basic_prompts = basic_prompts
-        self.on_basic_select = on_basic_select
-        self.on_text_change = on_text_change
+        self.on_select_callback = on_basic_select
+        self.on_text_change_callback = on_text_change
         self.variable_entries = {}
         self.create_widgets()
 
@@ -74,7 +74,7 @@ class BasicPromptFrame(ttk.LabelFrame):
                                            width=48)
         self.basic_combobox.grid(row=0, column=0, padx=5, pady=5)
         self.basic_combobox.bind("<<ComboboxSelected>>", self.on_basic_select)
-    
+
     def create_template_frame(self):
         """
         基本プロンプトテンプレート表示部分のウィジェットを生成します。
@@ -90,7 +90,7 @@ class BasicPromptFrame(ttk.LabelFrame):
         self.basic_text = tk.Text(template_frame, height=10, width=50)
         self.basic_text.grid(row=0, column=0, padx=5, pady=5)
         self.basic_text.bind("<KeyRelease>", self.on_text_change)
-    
+
     def create_variable_frame(self):
         """
         変数設定部分のウィジェットを生成します。
@@ -118,12 +118,12 @@ class BasicPromptFrame(ttk.LabelFrame):
         for widget in self.variable_frame.winfo_children():
             widget.destroy()
         self.variable_entries.clear()
-        
+
         # 固定高さを設定し、変数数に依存して高さが変わらないようにする（例: 200ピクセルに変更）
         fixed_height = 180  # 高さを増やして3行目が見切れないように調整
         self.variable_frame.config(height=fixed_height)
         self.variable_frame.grid_propagate(False)
-        
+
         # 列設定：左と右の2列、中央にスペーサーを配置
         self.variable_frame.columnconfigure(0, weight=1)
         self.variable_frame.columnconfigure(1, minsize=20)
@@ -139,3 +139,76 @@ class BasicPromptFrame(ttk.LabelFrame):
             entry.insert(0, default_value)
             entry.bind("<KeyRelease>", self.on_text_change)
             self.variable_entries[var] = entry
+
+    def on_basic_select(self, event):
+        """
+        基本プロンプト選択時の処理を行います。
+        
+        引数:
+          event: イベントオブジェクト
+          
+        戻り値:
+          なし
+        """
+        selection = self.basic_combobox.current()
+        if selection >= 0:
+            prompt_obj = self.basic_prompts[selection]
+            self.basic_text.delete(1.0, tk.END)
+            self.basic_text.insert(tk.END, prompt_obj["prompt"])
+            self.update_variable_entries(prompt_obj["default_variables"])
+            if self.on_select_callback:
+                self.on_select_callback(event)
+
+    def on_text_change(self, event):
+        """
+        テキスト変更時の処理を実行します。
+        
+        引数:
+          event: イベントオブジェクト
+          
+        戻り値:
+          なし
+        """
+        if self.on_text_change_callback:
+            self.on_text_change_callback(event)
+
+    def set_basic_prompt(self, index=0):
+        """
+        初期プロンプトを設定します。
+        
+        引数:
+          index (int): 選択するプロンプトのインデックス
+          
+        戻り値:
+          なし
+        """
+        if 0 <= index < len(self.basic_combobox['values']):
+            self.basic_combobox.current(index)
+            self.on_basic_select(None)
+
+    def update_basic_prompts(self, prompts):
+        """
+        基本プロンプトの一覧を更新します。
+        
+        引数:
+          prompts (list): 更新する基本プロンプトのリスト
+          
+        戻り値:
+          なし
+        """
+        self.basic_prompts = prompts
+        self.basic_combobox['values'] = [p["name"] for p in prompts]
+
+    def get_current_prompt(self):
+        """
+        現在選択されている基本プロンプトのテキストと変数値を取得します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          tuple: (基本プロンプトテキスト, 変数値の辞書)
+        """
+        basic_text = self.basic_text.get(1.0, tk.END).strip()
+        variables = {var: entry.get() for var, entry in self.variable_entries.items()}
+        return basic_text, variables

@@ -8,7 +8,7 @@ import pytest
 import requests
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from ui.final_prompt_frame import FinalPromptFrame
+from ui.frames.final_prompt_frame import FinalPromptFrame
 
 
 @pytest.fixture

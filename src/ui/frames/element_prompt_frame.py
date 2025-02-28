@@ -39,13 +39,15 @@ class ElementPromptFrame(ttk.LabelFrame):
         # element_prompts は辞書となっているため、default_subject と categories に分ける
         self.default_subject = element_prompts.get("default_subject", "被写体")
         self.categories = element_prompts.get("categories", [])
+        self.element_prompts = element_prompts
         super().__init__(master, text="追加プロンプト", *args, **kwargs)
-        self.on_element_select = on_element_select
-        self.on_text_change = on_text_change
+        self.on_select_callback = on_element_select
+        self.on_text_change_callback = on_text_change
         self.create_widgets()
         # ElementPromptFrame 自体のグリッド行と列に重みを設定して拡大を有効にする
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
+        self.element_prompt_content = ""
 
     def create_widgets(self):
         """
@@ -83,6 +85,7 @@ class ElementPromptFrame(ttk.LabelFrame):
         self.subject_entry.pack(side=tk.LEFT)
         # element_prompts.json から読み込んだ default_subject をセット
         self.subject_entry.insert(0, self.default_subject)
+        self.subject_entry.bind("<KeyRelease>", self.on_text_change)
 
         # select_frame の右側に「選択解除」ボタンを配置
         deselect_btn = ttk.Button(select_frame, text="選択解除", command=self.clear_selection)
@@ -111,3 +114,101 @@ class ElementPromptFrame(ttk.LabelFrame):
           なし
         """
         self.tree.selection_remove(self.tree.selection())
+        self.element_prompt_content = ""
+        if self.on_text_change_callback:
+            self.on_text_change_callback(None)
+
+    def on_element_select(self, event):
+        """
+        追加プロンプト選択時の処理を行います。
+        
+        引数:
+          event: イベントオブジェクト
+          
+        戻り値:
+          なし
+        """
+        selection = event.widget.selection()
+        selected_texts = []
+        seen_keys = set()
+        parent_ids = list(self.tree.get_children(""))
+
+        for item in selection:
+            parent = self.tree.parent(item)
+            if parent:
+                try:
+                    category_index = parent_ids.index(parent)
+                except ValueError:
+                    continue
+                category_data = self.element_prompts["categories"][category_index]
+                item_text = self.tree.item(item, "text")
+                for prompt in category_data["prompt_lists"]:
+                    if prompt["title"] == item_text:
+                        key = (category_data["category"], prompt["title"], prompt["prompt"])
+                        if key not in seen_keys:
+                            seen_keys.add(key)
+                            selected_texts.append(prompt["prompt"])
+                        break
+
+        element_prompt_raw = "\n".join(selected_texts)
+        subject_val = self.subject_entry.get().strip()
+
+        # template_manager がインスタンス変数として存在しないので、クラスを呼び出し側から利用してもらう
+        self.element_prompt_content = element_prompt_raw
+        self.subject_value = subject_val
+
+        if self.on_select_callback:
+            self.on_select_callback(event)
+
+    def on_text_change(self, event):
+        """
+        テキスト変更時の処理を実行します。
+        
+        引数:
+          event: イベントオブジェクト
+          
+        戻り値:
+          なし
+        """
+        if self.on_text_change_callback:
+            self.on_text_change_callback(event)
+
+    def update_element_prompts(self, element_prompts):
+        """
+        追加プロンプトの一覧を更新します。
+        
+        引数:
+          element_prompts (dict): 更新する追加プロンプトのデータ
+          
+        戻り値:
+          なし
+        """
+        self.element_prompts = element_prompts
+        self.default_subject = element_prompts.get("default_subject", "被写体")
+        self.categories = element_prompts.get("categories", [])
+
+        # ツリービューをクリア
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # ツリービューを再構築
+        for category in self.categories:
+            parent = self.tree.insert("", tk.END, text=category.get("category", ""))
+            for prompt in category.get("prompt_lists", []):
+                self.tree.insert(parent, tk.END, text=prompt.get("title", ""))
+
+        # 主語を更新
+        self.subject_entry.delete(0, tk.END)
+        self.subject_entry.insert(0, self.default_subject)
+
+    def get_prompt_content(self):
+        """
+        現在選択されている追加プロンプトの内容と主語を取得します。
+        
+        引数:
+          なし
+          
+        戻り値:
+          tuple: (追加プロンプト内容, 主語)
+        """
+        return self.element_prompt_content, self.subject_entry.get().strip()
