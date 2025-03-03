@@ -130,8 +130,8 @@ class OneClickFrame(ttk.Frame):
         """
         # タブの幅を固定するスタイル設定
         style = ttk.Style()
-        # TNotebook.Tabに固定幅（例: 幅15）と余白を設定（必要に応じて調整してください）
-        style.configure("TNotebook.Tab", padding=[2, 1], width=15)
+        # TNotebook.Tabに固定幅と余白を設定（タブ幅を小さく設定）
+        style.configure("TNotebook.Tab", padding=[2, 1], width=14)
 
         self.tab_notebook = ttk.Notebook(self)
         self.tab_notebook.pack(padx=10, pady=10, fill="both", expand=True)

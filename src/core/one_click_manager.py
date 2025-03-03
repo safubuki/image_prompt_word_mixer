@@ -8,8 +8,8 @@ import os
 from tkinter import messagebox
 
 DEFAULT_ENTRY_COUNT = 20
-DEFAULT_CATEGORIES = ["よく使う", "表情", "品質向上"]
-MAX_CATEGORIES = 7  # カテゴリタブの最大数
+DEFAULT_CATEGORIES = ["よく使う", "表情", "品質向上", "品質向上1", "品質向上2", "品質向上3", "品質向上4", "品質向上5"]
+MAX_CATEGORIES = 8  # カテゴリタブの最大数（7から8に変更）
 
 
 class OneClickManager:
