@@ -33,6 +33,7 @@ class OneClickFrame(ttk.Frame):
         self.manager = OneClickManager()  # ロジック部分の管理クラス
         # 各カテゴリごとのボタンウィジェットを格納する辞書
         self.button_widgets = {}
+        self.disable_copy = tk.BooleanVar(value=False)  # コピー無効フラグを追加
         self.create_widgets()
 
         # キーバインディングを修正して、テキストボックスにフォーカスがない時のみ動作するよう変更
@@ -261,6 +262,10 @@ class OneClickFrame(ttk.Frame):
         clear_btn = ttk.Button(button_panel, text="クリア", command=self.clear_current_entry)
         clear_btn.pack(side="top", fill="x", pady=(5, 0))
 
+        # コピー無効チェックボックスを追加
+        disable_copy_cb = ttk.Checkbutton(button_panel, text="コピー無効", variable=self.disable_copy)
+        disable_copy_cb.pack(side="top", fill="x", pady=(5, 0))
+
         edit_frame.columnconfigure(1, weight=1)
         # 矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
         hint_label = ttk.Label(edit_frame,
@@ -310,8 +315,12 @@ class OneClickFrame(ttk.Frame):
         entry = self.manager.get_entry(category, index)
         text_to_copy = entry["text"]
         title_to_copy = entry["title"]
-        self.clipboard_clear()
-        self.clipboard_append(text_to_copy)
+
+        # コピー無効チェックボックスがオフの場合のみクリップボードにコピー
+        if not self.disable_copy.get():
+            self.clipboard_clear()
+            self.clipboard_append(text_to_copy)
+
         self.title_edit.delete("1.0", tk.END)
         self.title_edit.insert(tk.END, title_to_copy)
         self.edit_text.delete("1.0", tk.END)
@@ -380,6 +389,9 @@ class OneClickFrame(ttk.Frame):
         戻り値:
           なし
         """
+        # コピー無効フラグの値を保持
+        disable_copy_value = self.disable_copy.get()
+
         # すべてのウィジェットを破棄
         for widget in self.winfo_children():
             widget.destroy()
@@ -389,6 +401,9 @@ class OneClickFrame(ttk.Frame):
 
         # エントリーを再読み込み
         self.manager = OneClickManager()
+
+        # コピー無効フラグを再初期化（以前の値を保持）
+        self.disable_copy = tk.BooleanVar(value=disable_copy_value)
 
         # UIを再構築
         self.create_widgets()
