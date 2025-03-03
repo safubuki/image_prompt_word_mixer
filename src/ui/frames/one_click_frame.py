@@ -9,7 +9,7 @@ one_click_frame.py
 import json
 import os
 import tkinter as tk
-from tkinter import ttk
+from tkinter import messagebox, ttk
 
 from src.core.one_click_manager import DEFAULT_ENTRY_COUNT, OneClickManager
 
@@ -34,7 +34,7 @@ class OneClickFrame(ttk.Frame):
         # 各カテゴリごとのボタンウィジェットを格納する辞書
         self.button_widgets = {}
         self.create_widgets()
-        
+
         # キーバインディングを修正して、テキストボックスにフォーカスがない時のみ動作するよう変更
         self.bind_all("<Up>", self.handle_up_key)
         self.bind_all("<Down>", self.handle_down_key)
@@ -175,25 +175,30 @@ class OneClickFrame(ttk.Frame):
         self.title_edit = tk.Text(edit_frame, height=1)
         self.title_edit.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
         self.title_edit.bind("<Tab>", self.move_focus_to_edit)
-        
+
         # テキストボックスにフォーカス状態変更コールバックを追加
         self.title_edit.bind("<FocusIn>", self.on_text_focus_in)
         self.title_edit.bind("<FocusOut>", self.on_text_focus_out)
-        
+
         text_label = ttk.Label(edit_frame, text="定型文:")
         text_label.grid(row=1, column=0, padx=5, pady=5, sticky="w")
         self.edit_text = tk.Text(edit_frame, height=5)
         self.edit_text.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        
+
         # テキストボックスにフォーカス状態変更コールバックを追加
         self.edit_text.bind("<FocusIn>", self.on_text_focus_in)
         self.edit_text.bind("<FocusOut>", self.on_text_focus_out)
-        
+
         # ボタンパネルの作成
         button_panel = ttk.Frame(edit_frame)
         button_panel.grid(row=0, column=2, rowspan=2, padx=5, pady=5, sticky="ns")
         save_btn = ttk.Button(button_panel, text="更新・保存", command=self.save_current_entry)
         save_btn.pack(side="top", fill="x")
+
+        # クリアボタンを追加
+        clear_btn = ttk.Button(button_panel, text="クリア", command=self.clear_current_entry)
+        clear_btn.pack(side="top", fill="x", pady=(5, 0))
+
         edit_frame.columnconfigure(1, weight=1)
         # 矢印キーによるボタン位置変更ヒントの表示（目立ちすぎないよう小さくグレーで表示）
         hint_label = ttk.Label(edit_frame,
@@ -316,16 +321,16 @@ class OneClickFrame(ttk.Frame):
         # すべてのウィジェットを破棄
         for widget in self.winfo_children():
             widget.destroy()
-        
+
         # ボタンウィジェット辞書をクリア
         self.button_widgets.clear()
-        
+
         # エントリーを再読み込み
         self.manager = OneClickManager()
-        
+
         # UIを再構築
         self.create_widgets()
-        
+
         # キーバインドを再設定
         self.bind_all("<Up>", self.handle_up_key)
         self.bind_all("<Down>", self.handle_down_key)
@@ -378,3 +383,37 @@ class OneClickFrame(ttk.Frame):
         # デバッグ用のコンソール出力（必要に応じて）
         # print("テキスト入力モード終了：ボタン移動有効")
         pass
+
+    def clear_current_entry(self):
+        """
+        確認ダイアログを表示し、OKが押された場合は
+        現在選択中のエントリーの内容をクリアします。
+        タイトルを「（空き）」に設定し、定型文を空にします。
+        
+        引数:
+          なし
+        
+        戻り値:
+          なし
+        """
+        if self.manager.current_category is not None and self.manager.current_index is not None:
+            # 確認ダイアログを表示
+            if messagebox.askokcancel("確認", "登録内容をクリアします"):
+                category = self.manager.current_category
+                index = self.manager.current_index
+
+                # タイトルを「（空き）」に、テキストを空文字に設定
+                new_title = "（空き）"
+                new_text = ""
+
+                # 管理クラスを通じてエントリーを更新
+                self.manager.update_entry(category, index, new_title, new_text)
+
+                # 編集領域の表示を更新
+                self.title_edit.delete("1.0", tk.END)
+                self.title_edit.insert(tk.END, new_title)
+                self.edit_text.delete("1.0", tk.END)
+
+                # ボタンの表示を更新
+                if category in self.button_widgets and index < len(self.button_widgets[category]):
+                    self.button_widgets[category][index].config(text=new_title)
