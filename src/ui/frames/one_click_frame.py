@@ -9,7 +9,7 @@ one_click_frame.py
 import json
 import os
 import tkinter as tk
-from tkinter import messagebox, ttk
+from tkinter import messagebox, simpledialog, ttk
 
 from src.core.one_click_manager import DEFAULT_ENTRY_COUNT, OneClickManager
 
@@ -136,9 +136,17 @@ class OneClickFrame(ttk.Frame):
         self.tab_notebook = ttk.Notebook(self)
         self.tab_notebook.pack(padx=10, pady=10, fill="both", expand=True)
 
-        # 管理クラスからカテゴリ一覧を取得
-        categories = list(self.manager.one_click_entries.keys())
+        # タブコンテキストメニュー設定
+        self.tab_context_menu = tk.Menu(self, tearoff=0)
+        self.tab_context_menu.add_command(label="タブ名変更", command=self.rename_selected_tab)
 
+        # タブ右クリックイベントを設定
+        self.tab_notebook.bind("<ButtonPress-3>", self.show_tab_context_menu)
+
+        # 管理クラスからカテゴリ一覧を取得（順序を保持）
+        categories = self.manager.category_order
+
+        # この順序どおりにタブを作成するので、タブの位置は維持されます
         for category in categories:
             frame = ttk.Frame(self.tab_notebook)
             self.tab_notebook.add(frame, text=category)
@@ -157,6 +165,60 @@ class OneClickFrame(ttk.Frame):
                 btn.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
                 self.button_widgets[category].append(btn)
                 frame.rowconfigure(row, weight=1)
+
+    def show_tab_context_menu(self, event):
+        """
+        タブを右クリックした際にコンテキストメニューを表示します。
+        
+        引数:
+          event: マウスイベント
+        
+        戻り値:
+          なし
+        """
+        try:
+            # クリックされた位置からタブインデックスを取得
+            clicked_tab = self.tab_notebook.tk.call(self.tab_notebook._w, "identify", "tab",
+                                                    event.x, event.y)
+
+            # タブが有効な場合のみメニューを表示
+            if clicked_tab >= 0:
+                self.tab_notebook.select(clicked_tab)  # クリックされたタブを選択状態にする
+                self.tab_context_menu.post(event.x_root, event.y_root)
+        except Exception as e:
+            print(f"タブメニュー表示中にエラーが発生しました: {e}")
+
+    def rename_selected_tab(self):
+        """
+        選択中のタブの名前を変更するダイアログを表示します。
+        
+        引数:
+          なし
+        
+        戻り値:
+          なし
+        """
+        current_tab_index = self.tab_notebook.index("current")
+        if current_tab_index < 0:
+            return
+
+        old_name = self.tab_notebook.tab(current_tab_index, "text")
+
+        # 新しいタブ名を入力するダイアログを表示
+        new_name = simpledialog.askstring("タブ名変更", "新しいタブ名を入力してください:", initialvalue=old_name)
+
+        # キャンセルされた場合や空の入力の場合は何もしない
+        if not new_name:
+            return
+
+        # OneClickManagerでカテゴリ名を変更（内部で順序は維持されます）
+        if self.manager.rename_category(old_name, new_name):
+            # タブのテキストを更新（位置はそのまま）
+            self.tab_notebook.tab(current_tab_index, text=new_name)
+
+            # button_widgetsのキーも更新
+            if old_name in self.button_widgets:
+                self.button_widgets[new_name] = self.button_widgets.pop(old_name)
 
     def create_editor_area(self):
         """
