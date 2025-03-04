@@ -178,13 +178,14 @@ class OneClickFrame(ttk.Frame):
           なし
         """
         try:
-            # クリックされた位置からタブインデックスを取得
-            clicked_tab = self.tab_notebook.tk.call(self.tab_notebook._w, "identify", "tab",
-                                                    event.x, event.y)
+            # クリックされた位置からタブ情報を取得
+            element = self.tab_notebook.identify(event.x, event.y)
 
-            # タブが有効な場合のみメニューを表示
-            if clicked_tab >= 0:
-                self.tab_notebook.select(clicked_tab)  # クリックされたタブを選択状態にする
+            # 要素が "tab" で始まる場合、タブがクリックされたことを意味する
+            if element and element.startswith("tab"):
+                # タブのインデックスを抽出
+                tab_index = int(element.split(".")[-1])
+                self.tab_notebook.select(tab_index)  # クリックされたタブを選択状態にする
                 self.tab_context_menu.post(event.x_root, event.y_root)
         except Exception as e:
             print(f"タブメニュー表示中にエラーが発生しました: {e}")
