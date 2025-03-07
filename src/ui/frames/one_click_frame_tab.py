@@ -27,6 +27,10 @@ class OneClickFrameTab:
         owner.tab_context_menu.add_separator()
         owner.tab_context_menu.add_command(label="新規タブ追加", command=self.add_new_tab)
         owner.tab_context_menu.add_command(label="タブ削除", command=self.delete_current_tab)
+        # 新規追加：タブ移動機能
+        owner.tab_context_menu.add_separator()
+        owner.tab_context_menu.add_command(label="タブを左に移動", command=self.move_tab_left)
+        owner.tab_context_menu.add_command(label="タブを右に移動", command=self.move_tab_right)
 
         # 複数のイベントを削除し、1つだけにシンプル化
         owner.tab_notebook.bind("<ButtonPress-3>", self.show_tab_context_menu)
@@ -167,3 +171,55 @@ class OneClickFrameTab:
                 print(f"タブ削除中にエラーが発生しました: {e}")
                 import traceback
                 traceback.print_exc()
+
+    def move_tab_left(self):
+        """タブを左に移動"""
+        owner = self.owner
+        current_index = owner.tab_notebook.index("current")
+        if current_index <= 0:
+            messagebox.showinfo("情報", "これ以上左には移動できません。")
+            return
+        # swap managerの順序リスト内のカテゴリ
+        order = owner.manager.category_order
+        order[current_index - 1], order[current_index] = order[current_index], order[current_index -
+                                                                                     1]
+        owner.manager.save_one_click_entries()
+        self.update_tabs_order()
+        print(f"タブを左に移動: インデックス {current_index} -> {current_index - 1}")
+
+    def move_tab_right(self):
+        """タブを右に移動"""
+        owner = self.owner
+        current_index = owner.tab_notebook.index("current")
+        if current_index >= len(owner.manager.category_order) - 1:
+            messagebox.showinfo("情報", "これ以上右には移動できません。")
+            return
+        order = owner.manager.category_order
+        order[current_index], order[current_index + 1] = order[current_index +
+                                                               1], order[current_index]
+        owner.manager.save_one_click_entries()
+        self.update_tabs_order()
+        print(f"タブを右に移動: インデックス {current_index} -> {current_index + 1}")
+
+    def update_tabs_order(self):
+        """
+        manager.category_order の順序に従い、タブのUIを再構築します。
+        既存のタブを全て削除し、再生成します。
+        """
+        owner = self.owner
+        # 現在の選択タブのカテゴリ名（再選択用）
+        try:
+            current_category = owner.tab_notebook.tab("current", "text")
+        except Exception:
+            current_category = None
+        # 全タブ削除
+        for tab_id in owner.tab_notebook.tabs():
+            owner.tab_notebook.forget(tab_id)
+        owner.button_widgets = {}
+        # manager.category_orderの順にタブ作成
+        for cat in owner.manager.category_order:
+            self.create_tab_for_category(cat)
+        # 可能なら再選択
+        if current_category and current_category in owner.manager.category_order:
+            new_index = owner.manager.category_order.index(current_category)
+            owner.tab_notebook.select(new_index)
