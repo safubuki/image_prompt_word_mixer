@@ -336,3 +336,39 @@ class OneClickManager:
         # 変更を保存（JSONファイルの保存位置は変わりません）
         self.save_one_click_entries()
         return True
+
+    def remove_category(self, category):
+        """
+        指定されたカテゴリを削除します
+        """
+        if category in self.category_order:
+            # 順序リストからカテゴリを削除
+            self.category_order.remove(category)
+
+            # エントリー辞書からカテゴリを削除
+            if category in self.one_click_entries:
+                del self.one_click_entries[category]
+
+            # 変更をJSONファイルに保存
+            self.save_one_click_entries()
+            return True
+        return False
+
+    def add_category(self, category):
+        """
+        新しいカテゴリ（タブ）を追加します。
+        """
+        if category in self.category_order:
+            return False
+
+        if len(self.category_order) >= MAX_CATEGORIES:
+            messagebox.showwarning("警告", f"カテゴリタブは{MAX_CATEGORIES}つまでしか設定できません。")
+            return False
+
+        self.category_order.append(category)
+        self.one_click_entries[category] = [{
+            "title": "",
+            "text": ""
+        } for _ in range(DEFAULT_ENTRY_COUNT)]
+        self.save_one_click_entries()
+        return True
