@@ -85,7 +85,7 @@ class OneClickFrameEditor:
                 category = owner.manager.current_category
                 index = owner.manager.current_index
 
-                new_title = "（空き）"
+                new_title = ""
                 new_text = ""
 
                 owner.manager.update_entry(category, index, new_title, new_text)
