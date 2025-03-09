@@ -21,7 +21,7 @@ class FinalPromptFrame(ttk.LabelFrame):
       master (tk.Widget): 親ウィジェット
       template_manager (object): テンプレート管理オブジェクト
       *args, **kwargs: その他
-      
+          
     戻り値:
       なし
     """
@@ -55,10 +55,9 @@ class FinalPromptFrame(ttk.LabelFrame):
         戻り値:
           なし
         """
-        self.create_final_text_area()
-        self.create_translate_button()
-        self.create_english_text_area()
         self.create_copy_buttons()
+        self.create_final_text_area()
+        self.create_english_text_area()
 
     def create_final_text_area(self):
         """
@@ -70,8 +69,12 @@ class FinalPromptFrame(ttk.LabelFrame):
         戻り値:
           なし
         """
+        # 日本語プロンプトのタイトルラベルを追加
+        jp_label = ttk.Label(self, text="日本語プロンプト")
+        jp_label.grid(row=1, column=0, columnspan=3, padx=5, pady=(5, 0), sticky="w")
+
         self.final_text = tk.Text(self, height=7, width=109)
-        self.final_text.grid(row=0, column=0, columnspan=2, padx=5, pady=5)
+        self.final_text.grid(row=2, column=0, columnspan=3, padx=5, pady=(0, 5))
 
     def create_translate_button(self):
         """
@@ -83,14 +86,12 @@ class FinalPromptFrame(ttk.LabelFrame):
         戻り値:
           なし
         """
-        translate_button = ttk.Button(self,
-                                      text="▼ プロンプトを英語に翻訳 ▼",
-                                      command=self.translate_to_english)
-        translate_button.grid(row=1, column=0, columnspan=2, padx=5, pady=5)
+        translate_button = ttk.Button(self, text="【プロンプトを英語翻訳】", command=self.translate_to_english)
+        return translate_button
 
     def create_english_text_area(self):
         """
-        英訳結果表示用テキスト領域（読み取り専用）を生成します。
+        英訳結果表示用テキスト領域（編集可能）を生成します。
         
         引数:
           なし
@@ -98,12 +99,16 @@ class FinalPromptFrame(ttk.LabelFrame):
         戻り値:
           なし
         """
-        self.english_text = tk.Text(self, height=7, width=109, state="disabled")
-        self.english_text.grid(row=2, column=0, columnspan=2, padx=5, pady=5)
+        # 英語プロンプトのタイトルラベルを追加
+        en_label = ttk.Label(self, text="英語プロンプト")
+        en_label.grid(row=3, column=0, columnspan=3, padx=5, pady=(5, 0), sticky="w")
+
+        self.english_text = tk.Text(self, height=7, width=109)
+        self.english_text.grid(row=4, column=0, columnspan=3, padx=5, pady=(0, 5))
 
     def create_copy_buttons(self):
         """
-        日本語プロンプト・英語プロンプトのコピー用ボタンを生成します。
+        日本語プロンプト・英語プロンプトのコピー用ボタンと翻訳ボタンを生成します。
         
         引数:
           なし
@@ -112,11 +117,16 @@ class FinalPromptFrame(ttk.LabelFrame):
           なし
         """
         copy_jp_button = ttk.Button(self, text="日本語プロンプトをコピー", command=self.copy_japanese_prompt)
+        translate_button = self.create_translate_button()
         copy_eng_button = ttk.Button(self, text="英語プロンプトをコピー", command=self.copy_english_prompt)
-        copy_jp_button.grid(row=3, column=0, padx=5, pady=5, sticky="e")
-        copy_eng_button.grid(row=3, column=1, padx=5, pady=5, sticky="w")
+
+        copy_jp_button.grid(row=0, column=0, padx=5, pady=5, sticky="e")
+        translate_button.grid(row=0, column=1, padx=5, pady=5)
+        copy_eng_button.grid(row=0, column=2, padx=5, pady=5, sticky="w")
+
         self.columnconfigure(0, weight=1)
         self.columnconfigure(1, weight=1)
+        self.columnconfigure(2, weight=1)
 
     def copy_japanese_prompt(self):
         """
@@ -199,10 +209,8 @@ class FinalPromptFrame(ttk.LabelFrame):
             translations = result.get("translations", [])
             if translations:
                 en_text = translations[0].get("text", "")
-                self.english_text.config(state="normal")
                 self.english_text.delete(1.0, tk.END)  # 既存のテキストをクリア
                 self.english_text.insert(tk.END, en_text)
-                self.english_text.config(state="disabled")
             else:
                 messagebox.showerror("エラー", "翻訳結果が取得できませんでした。")
         except requests.exceptions.RequestException as e:
@@ -276,6 +284,4 @@ class FinalPromptFrame(ttk.LabelFrame):
           なし
         """
         self.final_text.delete(1.0, tk.END)
-        self.english_text.config(state="normal")
         self.english_text.delete(1.0, tk.END)
-        self.english_text.config(state="disabled")
