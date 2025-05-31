@@ -94,51 +94,66 @@ class BasicPromptFrame(ttk.LabelFrame):
     def create_variable_frame(self):
         """
         変数設定部分のウィジェットを生成します。
-        
-        引数:
-          なし
-          
-        戻り値:
-          なし
         """
         self.variable_frame = ttk.LabelFrame(self, text="変数設定")
+        # 幅をさらに広げる（例: width=520）
         self.variable_frame.grid(row=2, column=0, padx=5, pady=5, sticky="nsew")
+        self.variable_frame.config(width=520)  # 幅を大きめに設定
+        self._variable_canvas = None
+        self._variable_inner_frame = None
+        self._variable_scrollbar = None
 
     def update_variable_entries(self, variables):
         """
         変数入力欄を更新します。
-        
-        引数:
-          variables (dict): プロンプトに含まれる変数とその初期値の辞書
-          
-        戻り値:
-          なし
+        Args:
+            variables (dict): プロンプトに含まれる変数とその初期値の辞書
+        Returns:
+            なし
         """
         # 既存ウィジェットの削除
         for widget in self.variable_frame.winfo_children():
             widget.destroy()
         self.variable_entries.clear()
 
-        # 固定高さを設定し、変数数に依存して高さが変わらないようにする（例: 200ピクセルに変更）
-        fixed_height = 180  # 高さを増やして3行目が見切れないように調整
-        self.variable_frame.config(height=fixed_height)
-        self.variable_frame.grid_propagate(False)
+        # 常にスクロールバー＋Canvas＋Frame構成で表示
+        canvas = tk.Canvas(self.variable_frame, height=180, borderwidth=0, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.variable_frame, orient="vertical", command=canvas.yview)
+        scrollable_frame = ttk.Frame(canvas)
+        window_id = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        canvas.grid(row=0, column=0, sticky="nsew")
+        scrollbar.grid(row=0, column=1, sticky="ns")
+        self.variable_frame.grid_rowconfigure(0, weight=1)
+        self.variable_frame.grid_columnconfigure(0, weight=1)
 
-        # 列設定：左と右の2列、中央にスペーサーを配置
-        self.variable_frame.columnconfigure(0, weight=1)
-        self.variable_frame.columnconfigure(1, minsize=20)
-        self.variable_frame.columnconfigure(2, weight=1)
+        def _on_frame_configure(_):
+            # scrollregionの更新
+            canvas.configure(scrollregion=canvas.bbox("all"))
+            # scrollable_frameの幅をcanvasに合わせる
+            canvas_width = canvas.winfo_width()
+            canvas.itemconfig(window_id, width=canvas_width)
 
+        scrollable_frame.bind("<Configure>", _on_frame_configure)
+        canvas.bind("<Configure>", _on_frame_configure)
+
+        for col in range(3):
+            scrollable_frame.columnconfigure(col,
+                                             weight=1 if col != 1 else 0,
+                                             minsize=20 if col == 1 else 0)
         for i, (var, default_value) in enumerate(variables.items()):
             row, col = divmod(i, 2)
             use_col = 0 if col == 0 else 2
-            label = ttk.Label(self.variable_frame, text=var)
-            label.grid(row=row * 2, column=use_col, padx=5, pady=0, sticky="w")
-            entry = ttk.Entry(self.variable_frame)
-            entry.grid(row=row * 2 + 1, column=use_col, padx=5, pady=5, sticky="ew")
+            label = ttk.Label(scrollable_frame, text=var)
+            label.grid(row=row * 2, column=use_col, padx=3, pady=(2, 0), sticky="w")
+            entry = ttk.Entry(scrollable_frame)
+            entry.grid(row=row * 2 + 1, column=use_col, padx=3, pady=(0, 4), sticky="ew")
             entry.insert(0, default_value)
             entry.bind("<KeyRelease>", self.on_text_change)
             self.variable_entries[var] = entry
+        self._variable_canvas = canvas
+        self._variable_inner_frame = scrollable_frame
+        self._variable_scrollbar = scrollbar
 
     def on_basic_select(self, event):
         """
