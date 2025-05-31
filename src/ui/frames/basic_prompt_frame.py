@@ -78,16 +78,11 @@ class BasicPromptFrame(ttk.LabelFrame):
     def create_template_frame(self):
         """
         基本プロンプトテンプレート表示部分のウィジェットを生成します。
-        
-        引数:
-          なし
-          
-        戻り値:
-          なし
         """
         template_frame = ttk.LabelFrame(self, text="基本プロンプト テンプレート表示")
         template_frame.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nsew")
-        self.basic_text = tk.Text(template_frame, height=10, width=50)
+        # 高さと幅を拡大（例: height=12, width=58）
+        self.basic_text = tk.Text(template_frame, height=12, width=58)
         self.basic_text.grid(row=0, column=0, padx=5, pady=5)
         self.basic_text.bind("<KeyRelease>", self.on_text_change)
 
